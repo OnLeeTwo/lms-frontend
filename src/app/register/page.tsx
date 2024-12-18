@@ -5,22 +5,19 @@ import { Input } from '@/components/ui/input';
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
-
-
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
-    role: "admin", // Default role
   });
 
   const { toast } = useToast();
   const router = useRouter();
 
-  const { username, email, password, role } = formData;
+  const { username, email, password } = formData;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -32,51 +29,28 @@ const RegisterPage = () => {
     e.preventDefault();
     console.log("Form Data Submitted:", formData);
     // Add API integration here to send the data to the backend
-    if (email === "teacher@example.com" && password === "password" && role === "teacher" && username === "teacher") {
-        toast({
-          title: "registrasi Berhasil!",
-          description: `Membawa anda ke profile page...`,
-          className: "bg-green-400",
-          duration: 1500,
-        });
-        router.push("/login");
-      } else {
-        console.error("Login failed!");
-      }
-  };
-
-  const handleRoleChange = (role: string) => {
-    setFormData({
-      ...formData,
-      role: role,
-    });
+    if (email && password && username) {
+      toast({
+        title: "Registrasi Berhasil!",
+        description: `Membawa Anda ke halaman login...`,
+        className: "bg-green-400",
+        duration: 1500,
+      });
+      router.push("/login");
+    } else {
+      toast({
+        title: "Registrasi Gagal!",
+        description: "Harap isi semua field dengan benar.",
+        className: "bg-red-400",
+        duration: 1500,
+      });
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Daftar Sebagai</h2>
-
-        {/* Role Selection Buttons */}
-        <div className="mb-4 flex justify-center">
-          <button
-            onClick={() => handleRoleChange("admin")}
-            className={`w-full px-6 py-2 rounded-l-md font-medium ${
-              formData.role === "admin" ? "bg-black text-white" : "bg-gray-200"
-            } hover:bg-gray-600 focus:outline-none`}
-          >
-            Admin
-          </button>
-          <button
-            onClick={() => handleRoleChange("teacher")}
-            className={`w-full px-6 py-2 rounded-r-md font-medium ${
-              formData.role === "teacher" ? "bg-black text-white" : "bg-gray-200"
-            } hover:bg-gray-600 focus:outline-none`}
-          >
-            Teacher
-          </button>
-        </div>
-
+        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
         <form onSubmit={handleSubmit}>
           {/* Username */}
           <div className="mb-4">
@@ -127,10 +101,7 @@ const RegisterPage = () => {
           </div>
 
           {/* Submit Button */}
-          <Button
-            type="submit"
-            className="w-full "
-          >
+          <Button type="submit" className="w-full">
             Register
           </Button>
         </form>
