@@ -5,17 +5,20 @@ import { Input } from '@/components/ui/input';
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
+
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
   });
 
+  const [profilePict, setProfilePict] = useState<File | null>(null);
+
   const { toast } = useToast();
   const router = useRouter();
 
-  const { username, email, password } = formData;
+  const { name, email, password } = formData;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -25,18 +28,58 @@ const RegisterPage = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if(e.target.files && e.target.files.length > 0){
+      setProfilePict(e.target.files[0]);
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form Data Submitted:", formData);
-    // Add API integration here to send the data to the backend
-    if (email && password && username) {
-      toast({
-        title: "Registrasi Berhasil!",
-        description: `Membawa Anda ke halaman login...`,
-        className: "bg-green-400",
-        duration: 1500,
-      });
-      router.push("/login");
+  
+    if (email && password && name) {
+      try {
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("password", password);
+        if(profilePict){
+          formData.append("profile_pict", profilePict);
+        }
+  
+        const response = await fetch("http://127.0.0.1:5000/api/v1/auth/register", {
+          method: "POST",
+          body: formData,
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          toast({
+            title: "Registrasi Berhasil!",
+            description: `Selamat, ${data.name}! Anda telah berhasil mendaftar.`,
+            className: "bg-green-400",
+            duration: 1500,
+          });
+          router.push("/login");
+        } else {
+          const errorData = await response.json();
+          toast({
+            title: "Registrasi Gagal!",
+            description: errorData.message || "Terjadi kesalahan saat registrasi.",
+            className: "bg-red-400",
+            duration: 1500,
+          });
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          toast({
+            title: "Registrasi Gagal!",
+            description: error.message || "Tidak dapat terhubung ke server.",
+            className: "bg-red-400",
+            duration: 1500,
+          });
+        }
+      }
     } else {
       toast({
         title: "Registrasi Gagal!",
@@ -46,6 +89,7 @@ const RegisterPage = () => {
       });
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -55,15 +99,15 @@ const RegisterPage = () => {
           {/* Username */}
           <div className="mb-4">
             <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              Username
+              Name
             </label>
             <Input
               type="text"
-              name="username"
-              id="username"
-              value={formData.username}
+              name="name"
+              id="name"
+              value={formData.name}
               onChange={handleChange}
-              placeholder="Enter your username"
+              placeholder="Enter your name"
               required
             />
           </div>
@@ -98,6 +142,20 @@ const RegisterPage = () => {
               placeholder="Enter your password"
               required
             />
+          </div>
+
+          {/* Profile Picture */}
+          <div className="mb-4">
+            <label htmlFor="profilePict" className="block text-sm font-medium text-gray-700">
+              Profile Picture
+              <Input
+                type="file"
+                name="profilePict"
+                id="profilePict"
+                onChange={handleFileChange}
+                accept="image/*"
+              />
+            </label>
           </div>
 
           {/* Submit Button */}
