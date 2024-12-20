@@ -37,7 +37,7 @@ const CourseModules = () => {
   return (
     <>
       <div className="flex min-h-screen bg-background">
-        <Sidebar role={"teacher"} />
+        <Sidebar role={"user"} />
         <div className="p-8 flex-1">
           <header className="mb-8">
             <h1 className="text-3xl font-bold">Course Modules</h1>

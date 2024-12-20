@@ -2,13 +2,12 @@ import { Sidebar } from "@/components/Sidebar";
 import { CourseCard } from "@/components/CourseCard";
 import SwitchUser from "@/components/SwitchUser";
 
-
 const mockCourses = [
   {
     id: 1,
     title: "Introduction to Computer Science",
     description: "Learn the fundamentals of computer science and programming.",
-    instructor: "Dr. Smith",
+    instructor: "John Doe",
     enrolledCount: 156,
   },
   {
@@ -34,11 +33,11 @@ const Index = () => {
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar role={userRole} />
-      <SwitchUser/>
+      <SwitchUser />
       <main className="flex-1 p-8">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-primary">
-            Welcome back, Teacher
+            Welcome back, John Doe
           </h1>
           <p className="text-muted-foreground">
             Manage your courses and students

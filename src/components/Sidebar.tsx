@@ -8,21 +8,23 @@ export const Sidebar = ({ role }: SidebarProps) => {
   const menuItems = [
     { icon: Home, label: "Dashboard", href: "/" },
     { icon: BookOpen, label: "Courses", href: "/" },
-    ...(role === "teacher"
-      ? [
-          {
-            icon: GraduationCap,
-            label: "Grade Submissions",
-            href: `/course/test/grading`,
-          },
-        ]
-      : []),
-    ...(role !== "student"
-      ? [{ icon: Users, label: "Users", href: "/users" }]
-      : []),
-    ...(role === "admin"
-      ? [{ icon: Settings, label: "Settings", href: "/settings" }]
-      : []),
+    { icon: Settings, label: "Settings", href: "/settings" },
+    { icon: Users, label: "Profile", href: "/profile" },
+    // ...(role === "teacher"
+    //   ? [
+    //       {
+    //         icon: GraduationCap,
+    //         label: "Grade Submissions",
+    //         href: `/course/test/grading`,
+    //       },
+    //     ]
+    //   : []),
+    // ...(role !== "student"
+    //   ? [{ icon: Users, label: "Users", href: "/users" }]
+    //   : []),
+    // ...(role === "admin"
+    //   ? [{ icon: Settings, label: "Settings", href: "/settings" }]
+    //   : []),
   ];
 
   return (

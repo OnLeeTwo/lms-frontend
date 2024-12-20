@@ -46,7 +46,7 @@ export const CourseCard = ({
         <span>Instructor: {instructor}</span>
         <span>{enrolledCount} enrolled</span>
       </div>
-      <Button onClick={() => router.push(`/modules/${id}`)} className="w-full">
+      <Button onClick={() => router.push(`${id}/modules`)} className="w-full">
         View Modules
       </Button>
     </Card>
