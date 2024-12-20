@@ -8,17 +8,7 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Sidebar } from "@/components/Sidebar";
-import {
-  EyeIcon,
-  SunMoon,
-  Type,
-  Contrast,
-  SaveIcon,
-  Bell,
-  Globe,
-  LayoutGrid,
-  Clock,
-} from "lucide-react";
+import { EyeIcon, SunMoon, Type, Contrast, SaveIcon, Bell } from "lucide-react";
 
 const Settings = () => {
   const { toast } = useToast();

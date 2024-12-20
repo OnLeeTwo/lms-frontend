@@ -1,4 +1,4 @@
-import { Home, BookOpen, Users, Settings, GraduationCap } from "lucide-react";
+import { Home, BookOpen, Users, GraduationCap, Settings } from "lucide-react";
 
 interface SidebarProps {
   role: string;
@@ -10,15 +10,15 @@ export const Sidebar = ({ role }: SidebarProps) => {
     { icon: BookOpen, label: "Courses", href: "/" },
     { icon: Settings, label: "Settings", href: "/settings" },
     { icon: Users, label: "Profile", href: "/profile" },
-    // ...(role === "teacher"
-    //   ? [
-    //       {
-    //         icon: GraduationCap,
-    //         label: "Grade Submissions",
-    //         href: `/course/test/grading`,
-    //       },
-    //     ]
-    //   : []),
+    ...(role === "teacher"
+      ? [
+          {
+            icon: GraduationCap,
+            label: "Grade Submissions",
+            href: `/course/test/grading`,
+          },
+        ]
+      : []),
     // ...(role !== "student"
     //   ? [{ icon: Users, label: "Users", href: "/users" }]
     //   : []),

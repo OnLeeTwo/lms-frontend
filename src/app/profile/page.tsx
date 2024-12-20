@@ -4,13 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  UserRound,
-  Mail,
-  BookOpen,
-  GraduationCap,
-  Building2,
-} from "lucide-react";
+import { UserRound, BookOpen, Building2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Sidebar } from "@/components/Sidebar";
