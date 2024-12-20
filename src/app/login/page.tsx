@@ -1,31 +1,73 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import * as Yup from "yup";
+
+import { Eye, EyeOff } from 'lucide-react';
+
+
+
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // For demo purposes, we'll use a simple validation
-    if (email === "teacher@example.com" && password === "password") {
+  const [visible, setVisible] = useState<boolean>(true);
+
+  interface LoginValues {
+    email: string;
+    password: string;
+  };
+
+  const validationSchema = Yup.object({
+    email: Yup.string().email("Invalid email address").required("Email is required"),
+    password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+  });
+
+  const handleLogin = async (values : LoginValues, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void })  => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/v1/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      })
+    
+    if (response.ok) {
+      const data = await response.json();
       toast({
         title: "Log In Sukses!",
-        description: `Membawa anda ke profile page...`,
+        description:`Welcome back, ${data.name}! Redirecting...`,
         className: "bg-green-400",
         duration: 1500,
       });
       router.push("/");
+      console.log(response);
     } else {
-      console.error("Login failed!");
+      const errorData = await response.json();
+        toast({
+          title: "Log In Gagal!",
+          description: errorData.message || "Invalid email or password.",
+          className: "bg-red-400",
+          duration: 1500,
+        });
+      }
+    } catch  {
+      toast({
+        title: "Log In Gagal!",
+        description:  "Failed to connect to the server.",
+        className: "bg-red-400",
+        duration: 1500,
+    });
+    }finally{
+      setSubmitting(false);
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
@@ -36,21 +78,28 @@ const Login = () => {
             Please sign in to continue
           </p>
         </div>
-
-        <form onSubmit={handleLogin} className="mt-8 space-y-6">
+        <Formik
+          initialValues={{ email: "", password: "" }}
+          validationSchema={validationSchema}
+          onSubmit={handleLogin}
+        >
+        {({ isSubmitting }) => (
+        <Form className="mt-8 space-y-6">
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium mb-2">
                 Email
+                <span className="text-red-500">*</span>
               </label>
-              <Input
+              <Field
                 id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                as={Input}
                 placeholder="Enter your email"
                 required
               />
+              <ErrorMessage name="email" component="p" className="text-red-500 text-sm mt-1" />
             </div>
 
             <div>
@@ -59,22 +108,34 @@ const Login = () => {
                 className="block text-sm font-medium mb-2"
               >
                 Password
+                <span className="text-red-500">*</span>
               </label>
-              <Input
+              <div className="relative w-full">
+              <Field
                 id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                type={visible ? 'password' : 'text'}
+                name="password"
+                as={Input}
                 placeholder="Enter your password"
                 required
               />
+              <div
+                className="absolute inset-y-0 right-0 flex items-center px-3 cursor-pointer"
+                onClick={() => setVisible(!visible)}
+              >
+                {visible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </div>
+              </div>
+              <ErrorMessage name="email" component="p" className="text-red-500 text-sm mt-1" />
             </div>
           </div>
 
-          <Button type="submit" className="w-full">
-            Sign in
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Logging in..." : "Log In"}
           </Button>
-        </form>
+        </Form>
+        )}
+        </Formik>
       </div>
     </div>
   );
