@@ -1,8 +1,8 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Button } from "../../../components/ui/button";
+import { Card } from "../../../components/ui/card";
 import { useParams } from "next/navigation";
-import { Sidebar } from "@/components/Sidebar";
+import { Sidebar } from "../../../components/Sidebar";
 
 interface Module {
   id: number;
