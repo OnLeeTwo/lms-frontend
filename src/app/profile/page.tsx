@@ -5,36 +5,90 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserRound, BookOpen, Building2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Sidebar } from "@/components/Sidebar";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { apiUrl } from "@/lib/env";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [userData, setUserData] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    role: "student",
-    enrolledCourses: 3,
+  const [userData, setUserData] = useState<{
+    token: string | null;
+    name: string;
+    email: string;
+    avatar: string;
+    enrolledCourses: number;
+    institutions: { id: number; name: string; role: string }[];
+  }>({
+    token: null,
+    name: "Fetching....",
+    email: "fetching@get.com",
     avatar: "/placeholder.svg",
-    institutions: [
-      {
-        id: 1,
-        name: "RevoU",
-        role: "student",
-      },
-      {
-        id: 2,
-        name: "Udemy",
-        role: "teacher",
-      },
-      {
-        id: 3,
-        name: "Coursera",
-        role: "student",
-      },
-    ],
+    enrolledCourses: 0,
+    institutions: [],
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch user data (token and institutions) from localStorage
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      setError(null);
+
+      const storedUserData = localStorage.getItem("userData");
+      if (!storedUserData) {
+        setError("User data not found. Please log in.");
+        setLoading(false);
+        return;
+      }
+
+      const parsedUserData = JSON.parse(storedUserData);
+      const { token, roles } = parsedUserData;
+
+      // Extract institutions from roles
+      const institutions =
+        roles?.map((role: any) => ({
+          id: role.institute_id,
+          name: role.institute_name,
+          role: role.role,
+        })) || [];
+
+      // Update userData with token and institutions
+      setUserData((prev) => ({ ...prev, token, institutions }));
+
+      // Fetch the full user profile data from the API
+      try {
+        const response = await fetch(`${apiUrl}/api/v1/users/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch profile. Please try again later.");
+        }
+
+        const data = await response.json();
+        setUserData((prev) => ({
+          ...prev,
+          name: data.name,
+          email: data.email,
+          avatar: data.profile_pict || "/placeholder.svg",
+          enrolledCourses: 0, // Adjust this as needed based on the response
+        }));
+      } catch (err: any) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleSave = () => {
     setIsEditing(false);
@@ -54,12 +108,16 @@ const Profile = () => {
           {/* Profile Card */}
           <Card className="p-6 text-center">
             <div className="flex justify-center mb-4">
-              <Avatar className="h-32 w-32">
-                <AvatarImage src={userData.avatar} alt={userData.name} />
-                <AvatarFallback>
-                  <UserRound className="h-16 w-16" />
-                </AvatarFallback>
-              </Avatar>
+              {loading ? (
+                <LoadingSpinner />
+              ) : (
+                <Avatar className="h-32 w-32">
+                  <AvatarImage src={userData.avatar} alt={userData.name} />
+                  <AvatarFallback>
+                    <UserRound className="h-16 w-16" />
+                  </AvatarFallback>
+                </Avatar>
+              )}
             </div>
             <h2 className="text-2xl font-semibold mb-2">{userData.name}</h2>
 
