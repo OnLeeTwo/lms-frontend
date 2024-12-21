@@ -8,6 +8,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
 import { Eye, EyeOff } from "lucide-react";
+import { apiUrl } from "@/lib/env";
 
 const RegisterPage = () => {
   const { toast } = useToast();
@@ -46,7 +47,7 @@ const RegisterPage = () => {
       }
 
       const response = await fetch(
-        "http://127.0.0.1:5000/api/v1/auth/register",
+        `${apiUrl}/api/v1/auth/register`,
         {
           method: "POST",
           body: formData,
