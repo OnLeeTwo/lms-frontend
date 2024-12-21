@@ -8,20 +8,30 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 
-export default function SwitchUser() {
-  const [selectedUser, setSelectedUser] = useState<string>("Institution");
+interface Role {
+  institute_name: string;
+  role: string;
+}
+
+interface SwitchUserProps {
+  roles: Role[];
+}
+
+export default function SwitchUser({ roles }: SwitchUserProps) {
+  const [selectedRole, setSelectedRole] = useState<string>(
+    roles[0]?.institute_name || "Select Role"
+  );
   const [activeOption, setActiveOption] = useState<number | null>(null);
-  const users = ["Revou", "Udemy", "Coursera"];
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (activeOption === null) return;
 
     if (e.key === "ArrowDown") {
-      setActiveOption((prev) => (prev === users.length - 1 ? 0 : prev! + 1));
+      setActiveOption((prev) => (prev === roles.length - 1 ? 0 : prev! + 1));
     } else if (e.key === "ArrowUp") {
-      setActiveOption((prev) => (prev === 0 ? users.length - 1 : prev! - 1));
+      setActiveOption((prev) => (prev === 0 ? roles.length - 1 : prev! - 1));
     } else if (e.key === "Enter" || e.key === " ") {
-      setSelectedUser(users[activeOption]);
+      setSelectedRole(roles[activeOption!].institute_name);
     }
   };
 
@@ -35,7 +45,7 @@ export default function SwitchUser() {
             aria-haspopup="true"
             aria-expanded="false"
           >
-            {selectedUser || "Select User"}
+            {selectedRole}
             {/* Down arrow */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -59,20 +69,22 @@ export default function SwitchUser() {
             tabIndex={-1}
             onKeyDown={handleKeyDown}
           >
-            {users.map((user, index) => (
+            {roles.map((role, index) => (
               <p
-                key={user}
+                key={role.institute_name}
                 role="menuitem"
                 tabIndex={0}
                 className={`cursor-pointer rounded-md px-4 py-2 text-sm transition-colors ${
                   activeOption === index
                     ? "bg-slate-200 text-black"
                     : "hover:bg-slate-100"
-                } ${selectedUser === user ? "font-semibold" : ""}`}
+                } ${
+                  selectedRole === role.institute_name ? "font-semibold" : ""
+                }`}
                 onMouseEnter={() => setActiveOption(index)}
-                onClick={() => setSelectedUser(user)}
+                onClick={() => setSelectedRole(role.institute_name)}
               >
-                {user}
+                {role.institute_name} ({role.role})
               </p>
             ))}
           </div>

@@ -32,7 +32,7 @@ export const Sidebar = ({ role }: SidebarProps) => {
   return (
     <nav className="h-screen w-64 bg-primary p-4 text-primary-foreground">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">LMS Portal</h1>
+        <h1 className="text-2xl font-bold ">LMS Portal</h1>
       </div>
       <ul className="space-y-2">
         {menuItems.map((item) => (

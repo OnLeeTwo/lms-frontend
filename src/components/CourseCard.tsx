@@ -16,8 +16,6 @@ export const CourseCard = ({
   id,
   title,
   description,
-  instructor,
-  enrolledCount,
   media,
 }: CourseCardProps) => {
   const router = useRouter();
