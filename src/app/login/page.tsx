@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { apiUrl } from "@/lib/env";
 
 import { Eye, EyeOff } from "lucide-react";
 
@@ -34,7 +35,7 @@ const Login = () => {
     { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
   ) => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/v1/auth/login", {
+      const response = await fetch(`${apiUrl}/api/v1/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,14 +45,14 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
+        localStorage.setItem("userData", JSON.stringify(data));
         toast({
           title: "Log In Sukses!",
           description: `Welcome back, ${data.name}! Redirecting...`,
           className: "bg-green-400",
           duration: 1500,
         });
-        router.push("/");
-        console.log(response);
+        router.push("/courses");
       } else {
         const errorData = await response.json();
         toast({
