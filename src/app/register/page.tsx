@@ -1,13 +1,14 @@
 "use client";
 import React, { useState } from "react";
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from "lucide-react";
+import { apiUrl } from "@/lib/env";
 
 const RegisterPage = () => {
   const { toast } = useToast();
@@ -19,15 +20,22 @@ const RegisterPage = () => {
     email: string;
     password: string;
     profilePict: File | null;
-  };
+  }
 
   const validationSchema = Yup.object({
     name: Yup.string().required("*name is required"),
-    email: Yup.string().email("*invalid email address").required("*email is required"),
-    password: Yup.string().min(6, "*password must be at least 6 characters").required("*password is required"),
+    email: Yup.string()
+      .email("*invalid email address")
+      .required("*email is required"),
+    password: Yup.string()
+      .min(6, "*password must be at least 6 characters")
+      .required("*password is required"),
   });
 
-  const handleSubmit = async (values: RegisterValues, { setSubmitting } : { setSubmitting: (isSubmitting: boolean) => void }) => {
+  const handleSubmit = async (
+    values: RegisterValues,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
     const { name, email, password, profilePict } = values;
     try {
       const formData = new FormData();
@@ -38,10 +46,13 @@ const RegisterPage = () => {
         formData.append("profile_pict", profilePict);
       }
 
-      const response = await fetch("http://127.0.0.1:5000/api/v1/auth/register", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `${apiUrl}/api/v1/auth/register`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -56,7 +67,8 @@ const RegisterPage = () => {
         const errorData = await response.json();
         toast({
           title: "Registrasi Gagal!",
-          description: errorData.message || "Terjadi kesalahan saat registrasi.",
+          description:
+            errorData.message || "Terjadi kesalahan saat registrasi.",
           className: "bg-red-400",
           duration: 1500,
         });
@@ -76,9 +88,9 @@ const RegisterPage = () => {
   };
 
   const initialValues: RegisterValues = {
-    name: '',
-    email: '',
-    password: '',
+    name: "",
+    email: "",
+    password: "",
     profilePict: null,
   };
 
@@ -95,15 +107,14 @@ const RegisterPage = () => {
             <Form>
               {/* Name */}
               <div className="mb-4">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 relative">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 relative"
+                >
                   Name
                   <span className="text-red-500">*</span>
                 </label>
-                <Field
-                  name="name"
-                  as={Input}
-                  placeholder="Enter your name"
-                />
+                <Field name="name" as={Input} placeholder="Enter your name" />
                 <ErrorMessage
                   name="name"
                   component="div"
@@ -113,7 +124,10 @@ const RegisterPage = () => {
 
               {/* Email */}
               <div className="mb-4">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Email
                   <span className="text-red-500">*</span>
                 </label>
@@ -132,23 +146,26 @@ const RegisterPage = () => {
 
               {/* Password */}
               <div className="mb-4">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Password
                   <span className="text-red-500">*</span>
                 </label>
                 <div className="relative w-full">
-                <Field
-                  name="password"
-                  type={visible ? 'password' : 'text'}
-                  as={Input}
-                  placeholder="Enter your password"
-                />
-                <div
-                  className="absolute inset-y-0 right-0 flex items-center px-3 cursor-pointer"
-                  onClick={() => setVisible(!visible)}
-                >
-                  {visible ? <EyeOff /> : <Eye/>}
-                </div>
+                  <Field
+                    name="password"
+                    type={visible ? "password" : "text"}
+                    as={Input}
+                    placeholder="Enter your password"
+                  />
+                  <div
+                    className="absolute inset-y-0 right-0 flex items-center px-3 cursor-pointer"
+                    onClick={() => setVisible(!visible)}
+                  >
+                    {visible ? <EyeOff /> : <Eye />}
+                  </div>
                 </div>
                 <ErrorMessage
                   name="password"
@@ -159,7 +176,10 @@ const RegisterPage = () => {
 
               {/* Profile Picture */}
               <div className="mb-4">
-                <label htmlFor="profilePict" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="profilePict"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Profile Picture
                 </label>
                 <Input
