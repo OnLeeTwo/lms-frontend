@@ -19,7 +19,7 @@ import {
   X,
 } from "lucide-react";
 
-import { getModuleById } from "@/services/moduleService";
+import { getModuleById, updateModule } from "@/services/moduleService";
 import { getAssessmentsByModuleId } from "@/services/assessmentService";
 import { Assessment } from "@/types/assessment";
 
@@ -65,7 +65,24 @@ export const mockModuleData = {
   module_id: 123,
   title: "Introduction to Modern Web Development",
   content: `
-  <h1>Course Overview </h1><p>Web development is a dynamic and exciting field that continues to evolve rapidly. In this module, we'll explore the fundamental technologies and principles that power modern web applications.  </p><h2>Key Learning Objectives </h2><ul><li><p>Understand the core technologies of web development</p></li><li><p>Learn about frontend and backend architectures </p></li><li><p>Explore best practices in responsive design </p></li><li><p>Gain insights into modern JavaScript frameworks </p></li></ul><h2>Technologies We'll Cover </h2><ol><li><p>HTML5 and semantic markup </p></li><li><p>CSS3 with flexbox and grid layouts </p></li><li><p>JavaScript and ES6+ features </p></li><li><p>React.js fundamentals </p></li><li><p>Next.js for server-side rendering </p></li></ol><pre class="rounded-md bg-muted p-4 font-mono text-sm"><code>Note: This is an introductory module designed for beginners with basic programming knowledge.</code></pre><p></p>`,
+  ## Course Overview
+  Web development is a dynamic and exciting field that continues to evolve rapidly. In this module, we'll explore the fundamental technologies and principles that power modern web applications.
+  
+  ### Key Learning Objectives
+  - Understand the core technologies of web development
+  - Learn about frontend and backend architectures
+  - Explore best practices in responsive design
+  - Gain insights into modern JavaScript frameworks
+  
+  ### Technologies We'll Cover
+  1. HTML5 and semantic markup
+  2. CSS3 with flexbox and grid layouts
+  3. JavaScript and ES6+ features
+  4. React.js fundamentals
+  5. Next.js for server-side rendering
+  
+  **Note:** This is an introductory module designed for beginners with basic programming knowledge.
+    `,
   module_file: "https://example.com/web-dev-intro-materials.pdf",
   created_at: "2024-02-15T10:30:00Z",
   updated_at: "2024-03-22T14:45:30Z",
@@ -75,17 +92,11 @@ export const mockModuleData = {
 const ModuleDetail = () => {
   const { moduleId } = useParams();
   const router = useRouter();
-  const [module, setModule] = useState<Module | undefined>();
+  const [module, setModule] = useState<Partial<Module> | undefined>();
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
-
-  //mocks
-  useEffect(() => {
-    setModule(mockModuleData as Module);
-    setAssessments(mockAssessmentData);
-  }, []);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -93,15 +104,12 @@ const ModuleDetail = () => {
 
   const handleSave = async (content: string) => {
     try {
-      // Here you would normally make an API call to save the content
       const updatedModule = {
-        ...module!,
         content: content,
-        updated_at: new Date().toISOString(),
       };
+      await updateModule(updatedModule);
       setModule(updatedModule);
       setIsEditing(false);
-      console.log("Updated module content:", updatedModule);
 
       toast({
         title: "Success",
@@ -119,39 +127,42 @@ const ModuleDetail = () => {
   const handleCancel = () => {
     setIsEditing(false);
   };
-  //Real
 
-  //   useEffect(() => {
-  //     const fetchModule = async () => {
-  //       try {
-  //         const data = await getModuleById();
-  //         setModule(data);
-  //       } catch (error) {
-  //         toast({
-  //           title: "Error",
-  //           description: "Failed to fetch module details",
-  //           variant: "destructive",
-  //         });
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     };
+  useEffect(() => {
+    const fetchModule = async () => {
+      try {
+        if (typeof moduleId === "string") {
+          const data = await getModuleById(moduleId);
+          setModule(data);
+        } else {
+          throw new Error("Invalid moduleId");
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch module details",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  //     fetchModule();
-  //   }, [moduleId, toast]);
+    fetchModule();
+  }, [moduleId, toast]);
 
-  //   if (loading) {
-  //     return (
-  //       <div className="flex min-h-screen bg-background">
-  //         <Sidebar role="teacher" />
-  //         <div className="p-8 flex-1">
-  //           <div className="flex items-center justify-center h-full">
-  //             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     );
-  //   }
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-background">
+        <Sidebar role="teacher" />
+        <div className="p-8 flex-1">
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!module) {
     return (
@@ -212,7 +223,7 @@ const ModuleDetail = () => {
 
         <div className="grid gap-6">
           <Card className="p-6">
-            <h1 className="text-xl font-semibold mb-4">Content</h1>
+            <h2 className="text-xl font-semibold mb-4">Content</h2>
             <div
               className={`prose max-w-none ${
                 isEditing ? "border rounded-md p-4" : ""

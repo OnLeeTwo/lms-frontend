@@ -1,8 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
+import { Plus } from "lucide-react";
 
 interface Module {
   id: number;
@@ -34,14 +35,29 @@ const mockModules: Module[] = [
 
 const CourseModules = () => {
   const { courseId } = useParams();
+
+  const router = useRouter();
+
+  const handleAddModule = () => {
+    router.push(`/modules/${courseId}/add`);
+  };
+
   return (
     <>
       <div className="flex min-h-screen bg-background">
         <Sidebar role={"teacher"} />
         <div className="p-8 flex-1">
           <header className="mb-8">
-            <h1 className="text-3xl font-bold">Course Modules</h1>
-            <p className="text-muted-foreground">Course ID: {courseId}</p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold">Course Modules</h1>
+                <p className="text-muted-foreground">Course ID: {courseId}</p>
+              </div>
+              <Button onClick={handleAddModule}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Module
+              </Button>
+            </div>
           </header>
 
           <div className="grid gap-6 ">
