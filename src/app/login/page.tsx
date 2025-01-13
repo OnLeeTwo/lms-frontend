@@ -9,6 +9,7 @@ import * as Yup from "yup";
 import { apiUrl } from "@/lib/env";
 
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 
 const Login = () => {
   const router = useRouter();
@@ -156,6 +157,17 @@ const Login = () => {
             </Form>
           )}
         </Formik>
+        <div className="flex justify-center items-center">
+        <a href="#" className="text-sm mr-1">
+        Don&apos;t have an account?
+        </a>
+        <Link
+          href="/register"
+          className=" text-blue-500 font-semibold text-sm hover:underline"
+        >
+          Register Here
+        </Link>
+      </div>
       </div>
     </div>
   );
