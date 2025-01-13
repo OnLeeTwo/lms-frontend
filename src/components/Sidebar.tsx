@@ -1,4 +1,11 @@
-import { LogOut, BookOpen, Users, GraduationCap, Settings } from "lucide-react";
+import {
+  LogOut,
+  BookOpen,
+  Users,
+  GraduationCap,
+  Settings,
+  Shield,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface SidebarProps {
@@ -11,12 +18,31 @@ export const Sidebar = ({ role }: SidebarProps) => {
     { icon: BookOpen, label: "Courses", href: "/courses" },
     { icon: Settings, label: "Settings", href: "/settings" },
     { icon: Users, label: "Profile", href: "/profile" },
-    ...(role === "teacher"
+    ...(role === "instructor"
       ? [
           {
             icon: GraduationCap,
-            label: "Grade Submissions",
-            href: `/course/test/grading`,
+            label: "Instructor Dashboard",
+            href: `/grading`,
+          },
+        ]
+      : []),
+    ...(role === "admin"
+      ? [
+          {
+            icon: Shield,
+            label: "User Management",
+            href: "/admin", // Admin-specific page
+          },
+          {
+            icon: Shield,
+            label: "Enrollment Management",
+            href: "/enrollment", // Admin-specific page
+          },
+          {
+            icon: Shield,
+            label: "Institute Settings",
+            href: "/institute", // Admin-specific page
           },
         ]
       : []),

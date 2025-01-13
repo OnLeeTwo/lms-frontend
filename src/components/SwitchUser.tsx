@@ -9,15 +9,20 @@ import {
 } from "@/components/ui/popover";
 
 interface Role {
+  institute_id: number; // Add institute_id to Role
   institute_name: string;
   role: string;
 }
 
 interface SwitchUserProps {
   roles: Role[];
+  onInstituteChange: (instituteId: number) => void; // Add the onInstituteChange function prop
 }
 
-export default function SwitchUser({ roles }: SwitchUserProps) {
+export default function SwitchUser({
+  roles,
+  onInstituteChange,
+}: SwitchUserProps) {
   const [selectedRole, setSelectedRole] = useState<string>(
     roles[0]?.institute_name || "Select Role"
   );
@@ -31,7 +36,9 @@ export default function SwitchUser({ roles }: SwitchUserProps) {
     } else if (e.key === "ArrowUp") {
       setActiveOption((prev) => (prev === 0 ? roles.length - 1 : prev! - 1));
     } else if (e.key === "Enter" || e.key === " ") {
-      setSelectedRole(roles[activeOption!].institute_name);
+      const selectedRole = roles[activeOption!];
+      setSelectedRole(selectedRole.institute_name);
+      onInstituteChange(selectedRole.institute_id); // Pass institute_id to the parent
     }
   };
 
@@ -46,7 +53,6 @@ export default function SwitchUser({ roles }: SwitchUserProps) {
             aria-expanded="false"
           >
             {selectedRole}
-            {/* Down arrow */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="w-4 h-4 ml-2"
@@ -82,7 +88,10 @@ export default function SwitchUser({ roles }: SwitchUserProps) {
                   selectedRole === role.institute_name ? "font-semibold" : ""
                 }`}
                 onMouseEnter={() => setActiveOption(index)}
-                onClick={() => setSelectedRole(role.institute_name)}
+                onClick={() => {
+                  setSelectedRole(role.institute_name);
+                  onInstituteChange(role.institute_id); // Pass institute_id to the parent
+                }}
               >
                 {role.institute_name} ({role.role})
               </p>

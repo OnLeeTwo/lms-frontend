@@ -36,11 +36,18 @@ const CourseModules = () => {
         return;
       }
 
-      const { token } = JSON.parse(storedUserData);
+      const { token, roles } = JSON.parse(storedUserData);
+
+      // Check user role (instructor or student)
+      const isInstructor = roles.some(
+        (role: any) => role.role === "instructor"
+      );
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/student-courses/${courseId}/modules`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/${
+            isInstructor ? "courses" : "student-courses"
+          }/${courseId}/modules`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -131,7 +138,7 @@ const ModuleCard = ({ module }: { module: Module }) => {
             </a>
           )}
         </div>
-        <Button variant="outline">Start Module</Button>
+        {/* <Button variant="outline">Start Module</Button> */}
       </div>
     </Card>
   );
