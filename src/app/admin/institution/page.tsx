@@ -5,6 +5,7 @@ import CreateInstitution from './addInstitution';
 import DeleteInstitution from "./deleteInstitution";
 import UpdateInstitution from './updateInstitution';
 import { apiUrl } from "@/lib/env";
+import { Sidebar } from '@/components/Sidebar';
 
 interface Institution {
   id: number;
@@ -13,6 +14,7 @@ interface Institution {
   created_at: string;
   updated_at: string;
 }
+
 
 async function fetchInstitutions() {
   try {
@@ -77,7 +79,9 @@ export default function Institution() {
   }, []);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow space-y-4">
+    <div className="flex min-h-screen bg-background">
+      <Sidebar role="admin"/>
+      <div className="bg-white p-6 rounded-lg shadow space-y-4 w-full">
       <div className="flex justify-between items-center mb-4">
       <h2 className="text-2xl font-bold mb-4">Institution List</h2>
       <CreateInstitution/>
@@ -113,6 +117,7 @@ export default function Institution() {
           </tbody>
         </table>
       )}
+    </div>
     </div>
   );
 }
