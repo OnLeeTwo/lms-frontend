@@ -149,7 +149,16 @@ const SubmissionList = () => {
                           <AccordionContent>
                             {submission.file && <p>File: <a href={submission.file} target="_blank" rel="noopener noreferrer">View Submission</a></p>}
                             {submission.answer && (
-                              <pre className="rounded-md bg-muted p-4 font-mono text-sm">{JSON.stringify(submission.answer, null, 2)}</pre>
+                              <div className="rounded-md bg-muted p-4 font-mono text-sm">
+                                {Object.entries(submission.answer).map(([question, answer], index) => (
+                                  <div key={index} className="mb-2">
+                                    <span className="font-semibold">{question}: </span>
+                                    <span className="pl-4 text-gray-700">
+                                      {answer}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
                             )}
                           </AccordionContent>
                         </AccordionItem>
