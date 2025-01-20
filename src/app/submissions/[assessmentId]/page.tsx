@@ -295,11 +295,31 @@ const SubmissionList = () => {
               <div className="mt-4">
                 <strong>Submission Answer:</strong>
                 <div className="mt-2">
-                  <img
+                  {/* <img
                     src={selectedSubmission.file_url}
                     alt="Submission File"
                     className="w-full rounded-lg border shadow-md"
-                  />
+                  /> */}
+                  {selectedSubmission.file_url ? (
+                    selectedSubmission.file_url.endsWith(".pdf") ? (
+                      <a
+                        href={selectedSubmission.file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        Check Submission Answer
+                      </a>
+                    ) : (
+                      <img
+                        src={selectedSubmission.file_url}
+                        alt="Submission File"
+                        className="w-full rounded-lg border shadow-md"
+                      />
+                    )
+                  ) : (
+                    <p className="text-gray-500">No file available</p>
+                  )}
                 </div>
               </div>
               {/* Input Score */}
@@ -313,6 +333,7 @@ const SubmissionList = () => {
                   onChange={(e) => setScore(Number(e.target.value))}
                   className="mt-2"
                   placeholder="Enter a score (e.g., 85)"
+                  rel="noopener noreferrer"
                 />
               </div>
             </div>
