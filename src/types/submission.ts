@@ -8,4 +8,7 @@ export interface Submission {
   submitted_at: string;
   updated_at: string;
   user_name: string;
+  assessment_type: "essay" | "choices";
+  assessment_title: string;
+  question: string;
 }

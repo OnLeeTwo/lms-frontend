@@ -316,7 +316,7 @@ const ModuleDetail = () => {
                       <Button variant="outline" size="sm">
                         View Details
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => router.push(`/submissions/${assessment.id}`)}>
+                      <Button variant="outline" size="sm" onClick={() => router.push(`/assessments/${assessment.id}`)}>
                         View Submissions
                       </Button>
                     </div>
