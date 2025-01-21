@@ -1,3 +1,4 @@
+
 import {
   LogOut,
   BookOpen,
@@ -5,6 +6,7 @@ import {
   GraduationCap,
   Settings,
   Shield,
+  Landmark
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -18,7 +20,7 @@ export const Sidebar = ({ role }: SidebarProps) => {
     { icon: BookOpen, label: "Courses", href: "/courses" },
     { icon: Settings, label: "Settings", href: "/settings" },
     { icon: Users, label: "Profile", href: "/profile" },
-    ...(role === "instructor"
+    ...(role === "instructor" || role === "teacher" 
       ? [
           {
             icon: GraduationCap,
