@@ -49,7 +49,7 @@ const Login = () => {
         localStorage.setItem("userData", JSON.stringify(data));
         toast({
           title: "Log In Sukses!",
-          description: `Welcome back, ${data.name}! Redirecting...`,
+          description: `Welcome back, ! Redirecting...`,
           className: "bg-green-400",
           duration: 1500,
         });

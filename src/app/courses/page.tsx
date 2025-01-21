@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { CourseCard } from "@/components/CourseCard";
@@ -40,6 +39,8 @@ const Index = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(false); // Track loading state
+  const [selectedInstituteId, setSelectedInstituteId] = useState<number>(1); // Track selected institute ID
+  const [currentRole, setCurrentRole] = useState<string>(""); // Track selected institution's role
 
   // Fetch user data from localStorage on mount
   useEffect(() => {
@@ -47,22 +48,32 @@ const Index = () => {
     if (storedUserData) {
       const parsedUserData = JSON.parse(storedUserData);
       setUserData(parsedUserData);
+
+      // Set initial role from the first institution in the roles
+      const initialRole =
+        parsedUserData.roles.find(
+          (role: Role) => role.institute_id === selectedInstituteId
+        )?.role || "student"; // Default to student if no role found
+      setCurrentRole(initialRole);
     }
   }, []);
 
-  // Fetch courses only when `userData` is available
+  // Fetch courses only when `userData` and `selectedInstituteId` are available and role is not 'admin'
   useEffect(() => {
-    if (!userData?.token) return; // Ensure token is available
+    if (!userData?.token || currentRole === "admin") return; // Skip fetching courses if role is 'admin'
 
     const fetchCourses = async () => {
       setLoading(true); // Set loading to true at the start
       try {
-        const response = await fetch(`${apiUrl}/api/v1/institute-courses/1`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userData.token}`,
-          },
-        });
+        const response = await fetch(
+          `${apiUrl}/api/v1/institute-courses/${selectedInstituteId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userData.token}`,
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch courses");
@@ -88,12 +99,29 @@ const Index = () => {
     };
 
     fetchCourses();
-  }, [userData?.token]); // Trigger only when token changes
+  }, [userData?.token, selectedInstituteId, currentRole]); // Trigger only when token, selectedInstituteId, or role changes
+
+  const handleInstituteChange = (instituteId: number) => {
+    setSelectedInstituteId(instituteId);
+
+    // Set the role for the selected institution
+    const roleForInstitute =
+      userData?.roles.find((role) => role.institute_id === instituteId)?.role ||
+      "student"; // Default to student if no role found
+    setCurrentRole(roleForInstitute);
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar role={userData?.roles[0]?.role || "teacher"} />
-      <SwitchUser roles={userData?.roles || []} />
+      {/* Sidebar dynamically updates based on the current role */}
+      <Sidebar role={currentRole} />
+
+      {/* SwitchUser allows user to select the institution */}
+      <SwitchUser
+        roles={userData?.roles || []}
+        onInstituteChange={handleInstituteChange}
+      />
+
       <main className="flex-1 p-8">
         <header className="mb-8">
           <div className="flex items-center space-x-4">
@@ -107,6 +135,11 @@ const Index = () => {
                 Welcome back, {userData?.user.name}
               </h1>
               <p className="text-muted-foreground">{userData?.user.email}</p>
+
+              {/* Display the role below the name */}
+              <p className="mt-2 text-sm font-medium text-muted-foreground">
+                Role: {currentRole}
+              </p>
             </div>
           </div>
         </header>

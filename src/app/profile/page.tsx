@@ -27,7 +27,7 @@ const Profile = () => {
     name: "Fetching....",
     email: "fetching@get.com",
     avatar: "/placeholder.svg",
-    enrolledCourses: 0,
+    enrolledCourses: 5,
     institutions: [],
   });
   const [loading, setLoading] = useState(true);
@@ -79,7 +79,7 @@ const Profile = () => {
           name: data.name,
           email: data.email,
           avatar: data.profile_pict || "/placeholder.svg",
-          enrolledCourses: 0, // Adjust this as needed based on the response
+          enrolledCourses: 5, // Adjust this as needed based on the response
         }));
       } catch (err: any) {
         console.error(err);
