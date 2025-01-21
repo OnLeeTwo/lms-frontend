@@ -25,35 +25,35 @@ import { Assessment } from "@/types/assessment";
 
 export const mockAssessmentData: Assessment[] = [
   {
-    assessment_id: 1,
+    id: 1,
     module_id: 101,
     type: "Essay",
     created_at: "2024-12-17T10:00:00",
     updated_at: "2024-12-17T10:30:00",
   },
   {
-    assessment_id: 2,
+    id: 2,
     module_id: 102,
     type: "Choices",
     created_at: "2024-12-18T12:00:00",
     updated_at: "2024-12-18T12:45:00",
   },
   {
-    assessment_id: 3,
+    id: 3,
     module_id: 103,
     type: "Essay",
     created_at: "2024-12-19T14:00:00",
     updated_at: "2024-12-19T14:30:00",
   },
   {
-    assessment_id: 4,
+    id: 4,
     module_id: 104,
     type: "Choices",
     created_at: "2024-12-20T09:00:00",
     updated_at: "2024-12-20T09:30:00",
   },
   {
-    assessment_id: 5,
+    id: 5,
     module_id: 105,
     type: "Essay",
     created_at: "2024-12-21T11:00:00",
@@ -78,13 +78,51 @@ const ModuleDetail = () => {
   const [module, setModule] = useState<Module | undefined>();
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
 
   //mocks
   useEffect(() => {
     setModule(mockModuleData as Module);
-    setAssessments(mockAssessmentData);
+    // setAssessments(mockAssessmentData);
+
+    const fetchAssessments = async () => {
+      setLoading(true);
+      setError(null);
+
+      const storedUserData = localStorage.getItem("userData");
+      if (!storedUserData) {
+        setError("User data not found. Please log in.");
+        setLoading(false);
+        return;
+      }
+
+      const { token, roles } = JSON.parse(storedUserData);
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/modules/9/assessments`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch modules. Please try again later.");
+        }
+
+        const data = await response.json();
+        setAssessments(data.assessments);
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Failed to fetch assessments");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAssessments();
   }, []);
 
   const handleEdit = () => {
@@ -260,14 +298,14 @@ const ModuleDetail = () => {
               <div className="space-y-4">
                 {assessments.map((assessment) => (
                   <div
-                    key={assessment.assessment_id}
+                    key={assessment.id}
                     className="flex items-center justify-between p-4 rounded-lg border"
                   >
                     <div className="flex items-center space-x-4">
                       <ClipboardList className="h-5 w-5 text-muted-foreground" />
                       <div>
                         <h3 className="font-medium">
-                          Assessment #{assessment.assessment_id}
+                          Assessment #{assessment.id}
                         </h3>
                         <p className="text-sm text-muted-foreground">
                           Type: {assessment.type}
@@ -278,7 +316,7 @@ const ModuleDetail = () => {
                       <Button variant="outline" size="sm">
                         View Details
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => router.push(`/submissions/${assessment.id}`)}>
                         View Submissions
                       </Button>
                     </div>
