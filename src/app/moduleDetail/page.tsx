@@ -157,6 +157,17 @@ const ModuleDetail = () => {
   const handleCancel = () => {
     setIsEditing(false);
   };
+
+  const handleViewDetails = (assessment: Assessment) => {
+    router.push(
+      `/assessments/${assessment.assessment_id}?type=${assessment.type}`
+    );
+  };
+
+  const handleViewSubmission = (assessment: Assessment) => {
+    router.push(`/submission?assessment_id=${assessment.assessment_id}`);
+  };
+
   //Real
 
   //   useEffect(() => {
@@ -313,10 +324,18 @@ const ModuleDetail = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button
+                        onClick={() => handleViewDetails(assessment)}
+                        variant="outline"
+                        size="sm"
+                      >
                         View Details
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => router.push(`/submissions/${assessment.id}`)}>
+                      <Button
+                        onClick={() => handleViewSubmission(assessment)}
+                        variant="outline"
+                        size="sm"
+                      >
                         View Submissions
                       </Button>
                     </div>
