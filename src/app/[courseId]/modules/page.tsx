@@ -83,13 +83,15 @@ const CourseModules = () => {
           <p className="text-muted-foreground">Course ID: {courseId}</p>
         </header>
 
-        {loading ? (
+        {loading && (
           <div className="flex justify-center items-center min-h-[200px]">
             <LoadingSpinner />
           </div>
-        ) : error ? (
+        )}
+        {!loading && error && (
           <div className="text-center text-red-500">{error}</div>
-        ) : (
+        )}
+        {!loading && !error && (
           <div className="grid gap-6">
             {modules.map((module) => (
               <ModuleCard key={module.id} module={module} />

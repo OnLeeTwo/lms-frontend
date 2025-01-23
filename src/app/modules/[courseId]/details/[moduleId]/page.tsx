@@ -1,7 +1,8 @@
 // src/app/modules/[courseId]/[moduleId]/page.tsx
 "use client";
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { NextRouter } from "next/router";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -90,8 +91,14 @@ export const mockModuleData = {
 };
 
 const ModuleDetail = () => {
-  const { moduleId } = useParams();
-  const router = useRouter();
+  const pathname = usePathname();
+  const router: NextRouter = useRouter();
+
+  const regex = /\/modules\/([^/]+)\/details\/([^/]+)/;
+  const match = regex.exec(pathname || "");
+
+  const courseId = match?.[1];
+  const moduleId = match?.[2];
   const [module, setModule] = useState<Partial<Module> | undefined>();
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,7 +114,7 @@ const ModuleDetail = () => {
       const updatedModule = {
         content: content,
       };
-      await updateModule(updatedModule);
+      await updateModule(updatedModule, courseId, moduleId);
       setModule(updatedModule);
       setIsEditing(false);
 
@@ -132,7 +139,7 @@ const ModuleDetail = () => {
     const fetchModule = async () => {
       try {
         if (typeof moduleId === "string") {
-          const data = await getModuleById(moduleId);
+          const data = await getModuleById(moduleId, courseId);
           setModule(data);
         } else {
           throw new Error("Invalid moduleId");
@@ -232,6 +239,7 @@ const ModuleDetail = () => {
               <Tiptap
                 content={module.content}
                 editable={isEditing}
+                isCreating={true}
                 onSave={handleSave}
                 onCancel={handleCancel}
               />

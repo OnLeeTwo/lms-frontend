@@ -1,4 +1,3 @@
-
 import {
   LogOut,
   BookOpen,
@@ -6,7 +5,7 @@ import {
   GraduationCap,
   Settings,
   Shield,
-  Landmark
+  Landmark,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -20,7 +19,7 @@ export const Sidebar = ({ role }: SidebarProps) => {
     { icon: BookOpen, label: "Courses", href: "/courses" },
     { icon: Settings, label: "Settings", href: "/settings" },
     { icon: Users, label: "Profile", href: "/profile" },
-    ...(role === "instructor" || role === "teacher" 
+    ...(role === "instructor" || role === "teacher"
       ? [
           {
             icon: GraduationCap,
@@ -58,7 +57,7 @@ export const Sidebar = ({ role }: SidebarProps) => {
   };
 
   return (
-    <nav className="h-screen w-64 bg-primary p-4 text-primary-foreground">
+    <nav className="h-screen w-64 bg-primary p-4 text-primary-foreground static">
       <div className="mb-8">
         <h1 className="text-2xl font-bold ">LMS Portal</h1>
       </div>
