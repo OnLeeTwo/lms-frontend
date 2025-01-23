@@ -1,4 +1,5 @@
 // Ambil token dari localStorage
+"use client";
 export const getToken = () => {
   const userData = localStorage.getItem("userData"); // Ambil data dari localStorage
   if (!userData) {

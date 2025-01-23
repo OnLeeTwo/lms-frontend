@@ -2,7 +2,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { NextRouter } from "next/router";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -16,8 +15,6 @@ import {
   Pencil,
   Trash2,
   ClipboardList,
-  Save,
-  X,
 } from "lucide-react";
 
 import { getModuleById, updateModule } from "@/services/moduleService";
@@ -92,7 +89,7 @@ export const mockModuleData = {
 
 const ModuleDetail = () => {
   const pathname = usePathname();
-  const router: NextRouter = useRouter();
+  const router = useRouter();
 
   const regex = /\/modules\/([^/]+)\/details\/([^/]+)/;
   const match = regex.exec(pathname || "");
@@ -123,6 +120,7 @@ const ModuleDetail = () => {
         description: "Module content updated successfully",
       });
     } catch (error) {
+      console.error(error);
       toast({
         title: "Error",
         description: "Failed to update module content",
@@ -145,6 +143,7 @@ const ModuleDetail = () => {
           throw new Error("Invalid moduleId");
         }
       } catch (error) {
+        console.error(error);
         toast({
           title: "Error",
           description: "Failed to fetch module details",
@@ -206,24 +205,9 @@ const ModuleDetail = () => {
               <h1 className="text-3xl font-bold">{module.title}</h1>
               <div className="flex items-center text-sm text-muted-foreground mt-2">
                 <Calendar className="mr-2 h-4 w-4" />
-                Last updated {new Date(module.updated_at).toLocaleDateString()}
+                Last updated{" "}
+                {new Date(module.updated_at ?? "empty").toLocaleDateString()}
               </div>
-            </div>
-            <div className="flex gap-2">
-              {!isEditing ? (
-                <>
-                  <Button variant="outline" onClick={handleEdit}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit Module
-                  </Button>
-                  <Button variant="destructive">
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Module
-                  </Button>
-                </>
-              ) : (
-                <></>
-              )}
             </div>
           </div>
         </header>
@@ -238,8 +222,6 @@ const ModuleDetail = () => {
             >
               <Tiptap
                 content={module.content}
-                editable={isEditing}
-                isCreating={true}
                 onSave={handleSave}
                 onCancel={handleCancel}
               />

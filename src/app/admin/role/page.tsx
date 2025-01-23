@@ -15,7 +15,7 @@ const UnderConstruction = () => {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <Sidebar role="instructor" />
+      <Sidebar role="admin" />
 
       {/* Main content area */}
       <div className="flex-1 p-8">

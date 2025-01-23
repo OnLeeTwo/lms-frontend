@@ -24,7 +24,7 @@ export const Sidebar = ({ role }: SidebarProps) => {
           {
             icon: GraduationCap,
             label: "Instructor Dashboard",
-            href: `/grading`,
+            href: `/dashboard`,
           },
         ]
       : []),
@@ -37,13 +37,13 @@ export const Sidebar = ({ role }: SidebarProps) => {
           },
           {
             icon: Shield,
-            label: "Enrollment Management",
-            href: "/enrollment", // Admin-specific page
+            label: "Role Management",
+            href: "/admin/role", // Admin-specific page
           },
           {
             icon: Shield,
-            label: "Institute Settings",
-            href: "/institute", // Admin-specific page
+            label: "Institute Management",
+            href: "/admin/institution", // Admin-specific page
           },
         ]
       : []),
@@ -52,14 +52,18 @@ export const Sidebar = ({ role }: SidebarProps) => {
   const handleSignOut = () => {
     // Remove userData from local storage
     localStorage.removeItem("userData");
+    sessionStorage.removeItem("currentRole");
+    sessionStorage.removeItem("instituteId");
     // Redirect to the index page
     router.push("/");
   };
 
   return (
-    <nav className="h-screen w-64 bg-primary p-4 text-primary-foreground static">
+    <nav className="h-screen w-64 bg-primary p-4 text-primary-foreground sticky top-0">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold ">LMS Portal</h1>
+        <h1 className="text-2xl font-bold ">
+          <a href="/dashboard">LMS Portal</a>
+        </h1>
       </div>
       <ul className="space-y-2">
         {menuItems.map((item) => (
