@@ -25,7 +25,7 @@ const UnderConstruction = () => {
             Page Under Construction
           </h1>
           <p className="mt-4 text-muted-foreground">
-            We're working hard to bring you this feature. Please check back
+            We&apos;re working hard to bring you this feature. Please check back
             later!
           </p>
           <Button

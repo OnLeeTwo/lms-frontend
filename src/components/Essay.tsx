@@ -83,7 +83,7 @@ export default function EssayQuiz({
               ))}
             </div>
             <button
-              onClick={() => router.push("/moduleDetail")}
+              onClick={() => router.back()}
               className="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
             >
               Back to Assignments
