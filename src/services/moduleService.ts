@@ -1,13 +1,21 @@
 import axios from "axios";
-import { Module } from "@/types/module";
+import { Module, ModuleResponse } from "@/types/module";
+import { apiUrl } from "@/lib/env";
+import { getToken } from "@/lib/getToken";
 
-const API_URL = "API_URL";
+const token = getToken();
 
-export const getModulesByCourseId = async (
+export const getStudentModulesByCourseId = async (
   courseId: string
-): Promise<Module[]> => {
+): Promise<ModuleResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/courses/${courseId}/modules`);
+    const token = getToken();
+    const response = await axios.get(
+      `${apiUrl}/api/v1/student-courses/${courseId}/modules`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching modules:", error);
@@ -15,9 +23,35 @@ export const getModulesByCourseId = async (
   }
 };
 
-export const getModuleById = async (moduleId: string): Promise<Module> => {
+export const getModulesByCourseId = async (
+  courseId: string
+): Promise<ModuleResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/modules/${moduleId}`);
+    const token = getToken();
+    const response = await axios.get(
+      `${apiUrl}/api/v1/courses/${courseId}/modules`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching modules:", error);
+    throw error;
+  }
+};
+
+export const getModuleById = async (
+  moduleId: string,
+  courseId: string
+): Promise<Module> => {
+  try {
+    const response = await axios.get(
+      `${apiUrl}/api/v1/courses/${courseId}/modules/${moduleId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching module:", error);
@@ -26,13 +60,65 @@ export const getModuleById = async (moduleId: string): Promise<Module> => {
 };
 
 export const updateModule = async (
-  module: Partial<Module>
+  module: Partial<Module>,
+  courseId: string,
+  moduleId: string
 ): Promise<Module> => {
   try {
     const response = await axios.patch(
-      `${API_URL}/modules/${module.module_id}`,
-      module
+      `${apiUrl}/api/v1/courses/${courseId}/modules/${moduleId}`,
+      module,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating module:", error);
+    throw error;
+  }
+};
+
+export const deleteModule = async (
+  courseId: string,
+  moduleId: string
+): Promise<Module> => {
+  try {
+    const response = await axios.delete(
+      `${apiUrl}/api/v1/courses/${courseId}/modules/${moduleId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting module:", error);
+    throw error;
+  }
+};
+
+export const addModule = async (
+  module: Partial<Module>,
+  courseId: string
+): Promise<Module> => {
+  try {
+    const response = await axios.post(
+      `${apiUrl}/api/v1/courses/${courseId}/modules`,
+      module,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     return response.data;
   } catch (error) {
     console.error("Error updating module:", error);

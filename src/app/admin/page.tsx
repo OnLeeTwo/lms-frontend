@@ -30,6 +30,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
+import { Sidebar } from "@/components/Sidebar";
 
 const accountData = [
   {
@@ -141,154 +142,157 @@ const AdminPage = () => {
   };
 
   return (
-    <div className="flex w-full justify-center">
-      <Card className="flex flex-col w-1/2 mx-10 my-8 justify-center items-center">
-        <CardHeader className="w-full text-center">
-          <CardTitle>
-            Participants
-            {/* SwitchUser */}
-            {userData && (
-              <SwitchUser
-                roles={userData.roles || []}
-                onInstituteChange={handleInstituteChange}
-              />
-            )}
-          </CardTitle>
-          <div className="flex justify-end gap-x-2">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="w-1/6">
-                  <Plus /> Add
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Add a user</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="email" className="text-right">
-                      Email
-                    </Label>
-                    <Input
-                      id="email"
-                      value={newUserEmail}
-                      onChange={(e) => setNewUserEmail(e.target.value)}
-                      className="col-span-3"
-                      placeholder="Enter an email"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="username" className="text-right">
-                      Name
-                    </Label>
-                    <Input
-                      id="username"
-                      value={newUserName}
-                      onChange={(e) => setNewUserName(e.target.value)}
-                      className="col-span-3"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="role" className="text-right">
-                      Role
-                    </Label>
-                    <select
-                      id="role"
-                      value={newUserRole}
-                      onChange={(e) => setNewUserRole(e.target.value)}
-                      className="col-span-3 border rounded p-2"
-                    >
-                      <option value="Instructor">Instructor</option>
-                      <option value="Student">Student</option>
-                    </select>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button
-                    onClick={handleAddUser}
-                    disabled={!newUserName || !newUserEmail || loading}
-                  >
-                    {loading ? "Adding..." : "Save changes"}
+    <div className="flex flex-row">
+      <Sidebar role="admin" />
+      <div className="flex w-full justify-center">
+        <Card className="flex flex-col w-1/2 mx-10 my-8 justify-center items-center">
+          <CardHeader className="w-full text-center">
+            <CardTitle>
+              Participants
+              {/* SwitchUser */}
+              {userData && (
+                <SwitchUser
+                  roles={userData.roles || []}
+                  onInstituteChange={handleInstituteChange}
+                />
+              )}
+            </CardTitle>
+            <div className="flex justify-end gap-x-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="w-1/6">
+                    <Plus /> Add
                   </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            <Button variant={"outline"} className="w-1/12">
-              Filter
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="w-full">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-2/6">Email</TableHead>
-                <TableHead className="w-2/6">Role</TableHead>
-                <TableHead className="w-2/6">Name</TableHead>
-                <TableHead className="w-1/6">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((account) => (
-                <TableRow key={account.id}>
-                  <TableCell>{account.email}</TableCell>
-                  <TableCell>{account.role}</TableCell>
-                  <TableCell>{account.name}</TableCell>
-                  <TableCell>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Add a user</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="email" className="text-right">
+                        Email
+                      </Label>
+                      <Input
+                        id="email"
+                        value={newUserEmail}
+                        onChange={(e) => setNewUserEmail(e.target.value)}
+                        className="col-span-3"
+                        placeholder="Enter an email"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="username" className="text-right">
+                        Name
+                      </Label>
+                      <Input
+                        id="username"
+                        value={newUserName}
+                        onChange={(e) => setNewUserName(e.target.value)}
+                        className="col-span-3"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="role" className="text-right">
+                        Role
+                      </Label>
+                      <select
+                        id="role"
+                        value={newUserRole}
+                        onChange={(e) => setNewUserRole(e.target.value)}
+                        className="col-span-3 border rounded p-2"
+                      >
+                        <option value="Instructor">Instructor</option>
+                        <option value="Student">Student</option>
+                      </select>
+                    </div>
+                  </div>
+                  <DialogFooter>
                     <Button
-                      variant="destructive"
-                      onClick={() => {
-                        setUserToRemove(account.id);
-                        setRemoveDialogOpen(true);
-                      }}
+                      onClick={handleAddUser}
+                      disabled={!newUserName || !newUserEmail || loading}
                     >
-                      <Trash />
+                      {loading ? "Adding..." : "Save changes"}
                     </Button>
-                  </TableCell>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Button variant={"outline"} className="w-1/12">
+                Filter
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="w-full">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-2/6">Email</TableHead>
+                  <TableHead className="w-2/6">Role</TableHead>
+                  <TableHead className="w-2/6">Name</TableHead>
+                  <TableHead className="w-1/6">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-        <CardFooter>
-          <Button
-            onClick={() => {
-              router.push("/courses");
-            }}
-          >
-            Back
-          </Button>
-        </CardFooter>
-      </Card>
-
-      {/* Remove User Confirmation Dialog */}
-      <Dialog open={isRemoveDialogOpen} onOpenChange={setRemoveDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              Are you sure you want to remove this user?
-            </DialogTitle>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setRemoveDialogOpen(false)}
-            >
-              Cancel
-            </Button>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((account) => (
+                  <TableRow key={account.id}>
+                    <TableCell>{account.email}</TableCell>
+                    <TableCell>{account.role}</TableCell>
+                    <TableCell>{account.name}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="destructive"
+                        onClick={() => {
+                          setUserToRemove(account.id);
+                          setRemoveDialogOpen(true);
+                        }}
+                      >
+                        <Trash />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+          <CardFooter>
             <Button
               onClick={() => {
-                if (userToRemove !== null) {
-                  handleRemoveUser(userToRemove);
-                }
+                router.push("/courses");
               }}
             >
-              Confirm
+              Back
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </CardFooter>
+        </Card>
+
+        {/* Remove User Confirmation Dialog */}
+        <Dialog open={isRemoveDialogOpen} onOpenChange={setRemoveDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                Are you sure you want to remove this user?
+              </DialogTitle>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setRemoveDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  if (userToRemove !== null) {
+                    handleRemoveUser(userToRemove);
+                  }
+                }}
+              >
+                Confirm
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 };

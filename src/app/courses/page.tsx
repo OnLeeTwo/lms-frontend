@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { CourseCard } from "@/components/CourseCard";
-import SwitchUser from "@/components/SwitchUser";
+import { getToken } from "@/lib/getToken";
 import { apiUrl } from "@/lib/env";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
@@ -36,131 +37,104 @@ interface UserData {
 }
 
 const Index = () => {
+  const router = useRouter();
+  const token = getToken();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(false); // Track loading state
   const [selectedInstituteId, setSelectedInstituteId] = useState<number>(1); // Track selected institute ID
   const [currentRole, setCurrentRole] = useState<string>(""); // Track selected institution's role
 
   // Fetch user data from localStorage on mount
   useEffect(() => {
-    const storedUserData = localStorage.getItem("userData");
-    if (storedUserData) {
-      const parsedUserData = JSON.parse(storedUserData);
-      setUserData(parsedUserData);
+    const currentRole = sessionStorage.getItem("currentRole");
+    const selectedInstituteId = sessionStorage.getItem("instituteId");
 
-      // Set initial role from the first institution in the roles
-      const initialRole =
-        parsedUserData.roles.find(
-          (role: Role) => role.institute_id === selectedInstituteId
-        )?.role || "student"; // Default to student if no role found
-      setCurrentRole(initialRole);
+    if (currentRole && selectedInstituteId) {
+      setCurrentRole(currentRole);
+      setSelectedInstituteId(Number(selectedInstituteId));
     }
   }, []);
 
   // Fetch courses only when `userData` and `selectedInstituteId` are available and role is not 'admin'
   useEffect(() => {
-    if (!userData?.token || currentRole === "admin") return; // Skip fetching courses if role is 'admin'
+    if (currentRole === "instructor") {
+      router.push("/instructor/courses");
+    } else {
+      const fetchCourses = async () => {
+        setLoading(true); // Set loading to true at the start
+        try {
+          const response = await fetch(
+            `${apiUrl}/api/v1/institute-courses/${selectedInstituteId}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
-    const fetchCourses = async () => {
-      setLoading(true); // Set loading to true at the start
-      try {
-        const response = await fetch(
-          `${apiUrl}/api/v1/institute-courses/${selectedInstituteId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${userData.token}`,
-            },
+          if (!response.ok) {
+            throw new Error("Failed to fetch courses");
           }
-        );
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch courses");
+          const data = await response.json();
+
+          // Transform the data to match the CourseCardProps structure
+          const transformedCourses = data.Courses.map((course: any) => ({
+            id: course.id,
+            title: course.title,
+            description: course.description,
+            instructor: "Unknown", // Placeholder
+            enrolledCount: Math.floor(Math.random() * 100) + 1, // Placeholder
+            media: course.media,
+          }));
+          setCourses(transformedCourses);
+        } catch (error) {
+          console.error("Error fetching courses:", error);
+        } finally {
+          setLoading(false); // Set loading to false when done
         }
+      };
 
-        const data = await response.json();
-
-        // Transform the data to match the CourseCardProps structure
-        const transformedCourses = data.Courses.map((course: any) => ({
-          id: course.id,
-          title: course.title,
-          description: course.description,
-          instructor: "Unknown", // Placeholder
-          enrolledCount: Math.floor(Math.random() * 100) + 1, // Placeholder
-          media: course.media,
-        }));
-        setCourses(transformedCourses);
-      } catch (error) {
-        console.error("Error fetching courses:", error);
-      } finally {
-        setLoading(false); // Set loading to false when done
-      }
-    };
-
-    fetchCourses();
-  }, [userData?.token, selectedInstituteId, currentRole]); // Trigger only when token, selectedInstituteId, or role changes
-
-  const handleInstituteChange = (instituteId: number) => {
-    setSelectedInstituteId(instituteId);
-
-    // Set the role for the selected institution
-    const roleForInstitute =
-      userData?.roles.find((role) => role.institute_id === instituteId)?.role ||
-      "student"; // Default to student if no role found
-    setCurrentRole(roleForInstitute);
-  };
+      fetchCourses();
+    }
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar dynamically updates based on the current role */}
-      <Sidebar role={currentRole} />
-
-      {/* SwitchUser allows user to select the institution */}
-      <SwitchUser
-        roles={userData?.roles || []}
-        onInstituteChange={handleInstituteChange}
-      />
-
-      <main className="flex-1 p-8">
-        <header className="mb-8">
-          <div className="flex items-center space-x-4">
-            <img
-              src={userData?.user.profile_pict}
-              alt={`${userData?.user.name}'s Profile Picture`}
-              className="w-16 h-16 rounded-full"
-            />
-            <div>
-              <h1 className="text-3xl font-bold text-primary">
-                Welcome back, {userData?.user.name}
-              </h1>
-              <p className="text-muted-foreground">{userData?.user.email}</p>
-
-              {/* Display the role below the name */}
-              <p className="mt-2 text-sm font-medium text-muted-foreground">
-                Role: {currentRole}
+      <Sidebar role="student" />
+      <div
+        className="p-5 bg-white shadow-md rounded-lg"
+        aria-labelledby="courses-heading"
+      >
+        <h2 id="courses-heading" className="text-2xl font-semibold mb-4">
+          Your Courses
+        </h2>
+        {(() => {
+          if (loading) {
+            return (
+              <div className="flex justify-center items-center">
+                <LoadingSpinner />
+              </div>
+            );
+          } else if (courses.length === 0) {
+            return (
+              <p className="text-lg font-medium text-gray-500">
+                No courses found.
               </p>
-            </div>
-          </div>
-        </header>
-
-        <section aria-labelledby="courses-heading">
-          <h2 id="courses-heading" className="text-2xl font-semibold mb-4">
-            Your Courses
-          </h2>
-          {loading ? (
-            <div className="flex justify-center items-center min-h-[200px]">
-              <LoadingSpinner />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map((course) => (
-                <CourseCard key={course.id} {...course} />
-              ))}
-            </div>
-          )}
-        </section>
-      </main>
+            );
+          } else {
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {courses.map((course) => (
+                  <CourseCard key={course.id} {...course} />
+                ))}
+              </div>
+            );
+          }
+        })()}
+      </div>
     </div>
   );
 };

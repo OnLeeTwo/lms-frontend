@@ -31,7 +31,7 @@ export const CourseCard = ({
       </div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <p className="text-muted-foreground mb-4">{description}</p>
-      <Button onClick={() => router.push(`${id}/modules`)} className="w-full">
+      <Button onClick={() => router.push(`modules/${id}`)} className="w-full">
         View Modules
       </Button>
     </Card>

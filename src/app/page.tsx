@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { apiUrl } from "@/lib/env";
-
 import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
@@ -48,11 +47,11 @@ const Login = () => {
         localStorage.setItem("userData", JSON.stringify(data));
         toast({
           title: "Log In Sukses!",
-          description: `Welcome back, ${data.name}! Redirecting...`,
+          description: `Welcome back, ${data.user.name}! Redirecting...`,
           className: "bg-green-400",
           duration: 1500,
         });
-        router.push("/courses");
+        router.push("/dashboard");
       } else {
         const errorData = await response.json();
         toast({
@@ -96,8 +95,7 @@ const Login = () => {
                     htmlFor="email"
                     className="block text-sm font-medium mb-2"
                   >
-                    Email
-                    <span className="text-red-500">*</span>
+                    Email<span className="text-red-500">*</span>
                   </label>
                   <Field
                     id="email"
@@ -119,8 +117,7 @@ const Login = () => {
                     htmlFor="password"
                     className="block text-sm font-medium mb-2"
                   >
-                    Password
-                    <span className="text-red-500">*</span>
+                    Password<span className="text-red-500">*</span>
                   </label>
                   <div className="relative w-full">
                     <Field

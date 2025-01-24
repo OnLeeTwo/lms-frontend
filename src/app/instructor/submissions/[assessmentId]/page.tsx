@@ -15,16 +15,13 @@ import { ArrowLeft, ClipboardList } from "lucide-react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/toaster";
-import { useToast } from "@/hooks/use-toast"
-
+import { useToast } from "@/hooks/use-toast";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 const SubmissionList = () => {
   const router = useRouter();
@@ -140,7 +137,12 @@ const SubmissionList = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex min-h-screen bg-background">
+        <Sidebar role="teacher" />
+        <LoadingSpinner className="flex align-center justify-center min-h-screen bg-background" />
+      </div>
+    );
   }
 
   if (error) {
@@ -193,16 +195,16 @@ const SubmissionList = () => {
             </div>
             {submissions.length === 0 ? (
               <div className="text-center py-6 text-muted-foreground">
-                No submissions available for this module.
+                No submissions available for this assessment yet.
               </div>
             ) : (
               <div className="space-y-4">
                 {submissions.map((submission) => (
-                  <div className="p-4 rounded-lg border">
-                    <div
-                      key={submission.submission_id}
-                      className="flex items-center justify-between"
-                    >
+                  <div
+                    key={submission.submission_id}
+                    className="p-4 rounded-lg border"
+                  >
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <ClipboardList className="h-5 w-5 text-muted-foreground" />
                         <div>
@@ -339,12 +341,12 @@ const SubmissionList = () => {
             </div>
           )}
           <DialogFooter>
-          <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-            Close
-          </Button>
-          <Button variant="default" onClick={handleSubmitScore}>
-            Submit Score
-          </Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Close
+            </Button>
+            <Button variant="default" onClick={handleSubmitScore}>
+              Submit Score
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
