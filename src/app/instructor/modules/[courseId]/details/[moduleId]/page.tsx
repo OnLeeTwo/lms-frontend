@@ -243,7 +243,7 @@ const ModuleDetail = () => {
                         size="sm"
                         onClick={() =>
                           router.push(
-                            `/instructor/assessments/${moduleId}/details/${assessment.id}`
+                            `/instructor/assessments/details/${assessment.id}`
                           )
                         }
                       >

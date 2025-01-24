@@ -13,6 +13,14 @@ import { Label } from "@/components/ui/label";
 import { Plus, Trash2, CheckCircle } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
 import { AssessmentDetails } from "@/types/assessment";
+import {
+  createAssesmentDetails,
+  updateAssesmentDetails,
+  getAssessmentsDetails,
+} from "@/services/assessmentService";
+import { useToast } from "@/hooks/use-toast";
+import { useParams } from "next/navigation";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface Option {
   text: string;
@@ -25,6 +33,8 @@ interface QuestionWithOptions {
 }
 
 const AssessmentDetailsPage: React.FC = () => {
+  const { toast } = useToast();
+  const { assessmentId } = useParams();
   const [assessmentType, setAssessmentType] = useState<"choices" | "essay">(
     "choices"
   );
@@ -49,6 +59,31 @@ const AssessmentDetailsPage: React.FC = () => {
       ],
     },
   ]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        if (typeof assessmentId === "string") {
+          const response = await getAssessmentsDetails(assessmentId);
+          setCurrentDetails(response);
+        } else {
+          throw new Error("Invalid assessment ID");
+        }
+      } catch (error) {
+        console.error("Error fetching assessment details:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch assessment details",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleAddQuestion = () => {
     setQuestions([
@@ -137,27 +172,60 @@ const AssessmentDetailsPage: React.FC = () => {
       payload.answer = null;
     }
 
-    // Conditionally add assessment_id if it's a new assessment
     if (currentDetails.assessment_id) {
-      // Update existing assessment
-      updateAssessment(currentDetails.assessment_id, payload);
+      createAssessment(currentDetails.assessment_id, payload);
     } else {
-      // Create new assessment
-      createAssessment(payload);
+      updateAssessment(payload);
     }
 
     setIsDialogOpen(false);
   };
 
   // Placeholder functions for API calls
-  const createAssessment = (data: any) => {
-    console.log("Creating assessment:", data);
-    // Implement actual API call
+  const createAssessment = async (
+    id: number,
+    data: Partial<AssessmentDetails>
+  ) => {
+    try {
+      const response = await createAssesmentDetails(id.toString(), data);
+      if (response) {
+        toast({
+          title: "Success",
+          description: "Assessment details created successfully",
+          variant: "default",
+        });
+      }
+    } catch (error) {
+      console.error("Error creating assessment details:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create assessment details",
+        variant: "destructive",
+      });
+    }
   };
 
-  const updateAssessment = (id: number, data: any) => {
-    console.log("Updating assessment:", id, data);
-    // Implement actual API call
+  const updateAssessment = async (data: Partial<AssessmentDetails>) => {
+    try {
+      const response = await updateAssesmentDetails(
+        currentDetails.assessment_id.toString(),
+        data
+      );
+      if (response) {
+        toast({
+          title: "Success",
+          description: "Assessment details updated successfully",
+          variant: "default",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating assessment details:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update assessment details",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -173,42 +241,50 @@ const AssessmentDetailsPage: React.FC = () => {
               </Button>
             ) : null}
           </CardHeader>
-          <CardContent>
-            {currentDetails.title ? (
-              <div>
-                {/* Existing details rendering logic */}
-                <h2 className="text-xl font-bold mb-4">
-                  {currentDetails.title}
-                </h2>
-                <p>Deadline: {currentDetails.deadline}</p>
-                {Object.entries(currentDetails.question).map(
-                  ([question, value]) => (
-                    <div key={question} className="mb-4">
-                      <h3 className="font-semibold">{question}</h3>
-                      {typeof value === "object" ? (
-                        <ul>
-                          {Object.entries(value).map(([option, optionText]) => (
-                            <li key={option}>
-                              {option}: {optionText}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p>{value}</p>
-                      )}
-                    </div>
-                  )
-                )}
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 p-6">
-                No assessment details found.
-                <Button onClick={() => setIsDialogOpen(true)} className="ml-2">
-                  Create New Details
-                </Button>
-              </div>
-            )}
-          </CardContent>
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            <CardContent>
+              {currentDetails.title ? (
+                <div>
+                  <h2 className="text-xl font-bold mb-4">
+                    {currentDetails.title}
+                  </h2>
+                  <p>Deadline: {currentDetails.deadline}</p>
+                  {Object.entries(currentDetails.question).map(
+                    ([question, value]) => (
+                      <div key={question} className="mb-4">
+                        <h3 className="font-semibold">{question}</h3>
+                        {typeof value === "object" ? (
+                          <ul>
+                            {Object.entries(value).map(
+                              ([option, optionText]) => (
+                                <li key={option}>
+                                  {option}: {optionText}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        ) : (
+                          <p>{value}</p>
+                        )}
+                      </div>
+                    )
+                  )}
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 p-6">
+                  No assessment details found.
+                  <Button
+                    onClick={() => setIsDialogOpen(true)}
+                    className="ml-2"
+                  >
+                    Create New Details
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          )}
         </Card>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

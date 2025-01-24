@@ -39,3 +39,41 @@ export const getAssessmentsDetails = async (
     throw error;
   }
 };
+
+export const updateAssesmentDetails = async (
+  assessmentId: string,
+  assementDetails: Partial<AssessmentDetails>
+): Promise<AssessmentDetails> => {
+  try {
+    const response = await axios.patch(
+      `${apiUrl}/api/v1/assessment_details/${assessmentId}`,
+      assementDetails,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating assessments:", error);
+    throw error;
+  }
+};
+
+export const createAssesmentDetails = async (
+  assessmentId: string,
+  assementDetails: Partial<AssessmentDetails>
+): Promise<AssessmentDetails> => {
+  try {
+    const response = await axios.post(
+      `${apiUrl}/api/v1/assessments_details/${assessmentId}`,
+      assementDetails,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error creating assessments:", error);
+    throw error;
+  }
+};

@@ -161,7 +161,7 @@ const Index = () => {
                 Courses
               </a>
               <a
-                href="/instructor/module"
+                href="/instructor/modules"
                 className="flex flex-col place-items-center p-4 border-solid"
               >
                 <Library className="mb-2 h-6 w-6" />
