@@ -1,3 +1,4 @@
+"use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -16,7 +17,7 @@ export function withAuth(WrappedComponent) {
       const storedUserData = localStorage.getItem("userData");
       const parsedUserData = storedUserData ? JSON.parse(storedUserData) : null;
 
-      if (parsedUserData && !parsedUserData.role) {
+      if (parsedUserData && parsedUserData.roles.length < 0) {
         router.push("/welcome");
       }
     }, []);

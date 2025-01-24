@@ -23,8 +23,8 @@ import {
 interface TiptapProps {
   content: string | undefined;
   editable?: boolean;
-  onSave: (content: string) => void;
-  onCancel: () => void;
+  onSave?: (content: string) => void;
+  onCancel?: () => void;
   isCreating?: boolean;
 }
 

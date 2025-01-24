@@ -9,7 +9,7 @@ const UnderConstruction = () => {
   const router = useRouter();
 
   const handleGoBack = () => {
-    router.push("/courses"); // Adjust the route as necessary
+    router.back(); // Adjust the route as necessary
   };
 
   return (

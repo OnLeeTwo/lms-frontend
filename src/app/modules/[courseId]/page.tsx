@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useParams, useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
-import { getModulesByCourseId } from "@/services/moduleService";
+import { getStudentModulesByCourseId } from "@/services/moduleService";
 import { Module } from "@/types/module";
 
 const CourseModules = () => {
@@ -32,7 +32,7 @@ const CourseModules = () => {
         setLoading(true); // Set loading to true at the start
         try {
           if (typeof courseId === "string") {
-            const response = await getModulesByCourseId(courseId);
+            const response = await getStudentModulesByCourseId(courseId);
             setModules(response.modules);
           } else {
             console.error("Invalid courseId:", courseId);
@@ -50,7 +50,7 @@ const CourseModules = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar role={"teacher"} />
+      <Sidebar role={"student"} />
       <div className="p-8 flex-1">
         <header className="mb-8">
           <div className="flex justify-between items-center">
@@ -71,14 +71,23 @@ const CourseModules = () => {
               return (
                 <>
                   {modules.map((module) => (
-                    <Card key={module.module_id} className="p-6">
+                    <Card key={module.id} className="p-6">
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="text-xl font-semibold mb-2">
                             {module.title}
                           </h3>
                         </div>
-                        <Button variant="outline">Start Module</Button>
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            router.push(
+                              `/modules/${courseId}/details/${module.id}`
+                            )
+                          }
+                        >
+                          Start Module
+                        </Button>
                       </div>
                     </Card>
                   ))}

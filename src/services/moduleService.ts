@@ -5,6 +5,24 @@ import { getToken } from "@/lib/getToken";
 
 const token = getToken();
 
+export const getStudentModulesByCourseId = async (
+  courseId: string
+): Promise<ModuleResponse> => {
+  try {
+    const token = getToken();
+    const response = await axios.get(
+      `${apiUrl}/api/v1/student-courses/${courseId}/modules`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching modules:", error);
+    throw error;
+  }
+};
+
 export const getModulesByCourseId = async (
   courseId: string
 ): Promise<ModuleResponse> => {

@@ -1,7 +1,18 @@
 export interface Assessment {
-  assessment_id: number;
+  id: number;
   module_id: number;
-  type: "Essay" | "Choices";
+  type: "essay" | "choices";
   created_at: string;
   updated_at: string;
+}
+
+export interface AssessmentDetails {
+  assessment_id: number;
+  title: string;
+  question: Record<string, Record<string, string>> | Record<string, string>; // choices or essay questions
+  answer: Record<string, string> | null; //null for essay
+  deadline: string;
+  created_at: string;
+  updated_at: string;
+  message: string;
 }

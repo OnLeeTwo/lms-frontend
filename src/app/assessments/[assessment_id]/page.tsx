@@ -1,31 +1,54 @@
-'use client';
+"use client";
+import React, { useState, useEffect } from "react";
+import EssayQuiz from "@/components/Essay";
+import MultipleChoiceQuiz from "@/components/MultipleChoices";
+import { useSearchParams } from "next/navigation";
+import { Sidebar } from "@/components/Sidebar";
+import { getAssessmentsDetails } from "@/services/assessmentService";
+import { AssessmentDetails } from "@/types/assessment";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
-import React from 'react';
-import EssayQuiz from '@/components/Essay';
-import MultipleChoiceQuiz from '@/components/MultipleChoices';
-import { useSearchParams } from 'next/navigation';
-
-export default function AssessmentDetailsPage({ params }: { params: Promise<{ assessment_id: string }> }) {
-  const [unwrappedParams, setUnwrappedParams] = React.useState<{ assessment_id: string } | null>(null);
+export default function AssessmentDetailsPage({
+  params,
+}: {
+  readonly params: { readonly assessment_id: string };
+}) {
+  const [assessmentDetails, setAssessmentDetails] =
+    useState<AssessmentDetails | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const searchParams = useSearchParams();
-  const type = searchParams.get('type');
+  const type = searchParams.get("type");
+  const { assessment_id } = params;
 
-  React.useEffect(() => {
-    params.then((resolvedParams) => setUnwrappedParams(resolvedParams));
-  }, [params]);
-
-  if (!unwrappedParams) {
-    return <p>Loading...</p>;
-  }
-
-  const { assessment_id } = unwrappedParams;
+  useEffect(() => {
+    async function fetchAssessmentDetails() {
+      try {
+        setIsLoading(true);
+        const response = await getAssessmentsDetails(assessment_id);
+        setAssessmentDetails(response);
+      } catch (error) {
+        console.error("Error fetching assessment details:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchAssessmentDetails();
+  }, [assessment_id]);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Assessment Details</h1>
-      {type === 'Choices' && <MultipleChoiceQuiz assessment_id={assessment_id} />}
-      {type === 'Essay' && <EssayQuiz assessment_id={assessment_id} />}
-      {!type && <p>Invalid assessment type.</p>}
+    <div className="flex min-h-screen bg-background">
+      <Sidebar role="student" />
+      {isLoading ? <LoadingSpinner /> : null}
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-4">Assessment Details</h1>
+        {type === "choices" && assessmentDetails && (
+          <MultipleChoiceQuiz assessment_details={assessmentDetails} />
+        )}
+        {type === "essay" && assessmentDetails && (
+          <EssayQuiz assessment={assessmentDetails} />
+        )}
+        {!type && <p>Invalid assessment type.</p>}
+      </div>
     </div>
   );
 }

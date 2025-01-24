@@ -161,21 +161,21 @@ const Index = () => {
                 Courses
               </a>
               <a
-                href="/instructor/courses"
+                href="/instructor/module"
                 className="flex flex-col place-items-center p-4 border-solid"
               >
                 <Library className="mb-2 h-6 w-6" />
                 Module
               </a>
               <a
-                href="/submissions"
+                href="/instructor/submissions"
                 className="flex flex-col place-items-center p-4 border-solid"
               >
                 <ClipboardList className="mb-2 h-6 w-6" />
                 Submission
               </a>
               <a
-                href="/assessments"
+                href="/instructor/assessments"
                 className="flex flex-col place-items-center p-4 border-solid"
               >
                 <Gauge className="mb-2 h-6 w-6" />
