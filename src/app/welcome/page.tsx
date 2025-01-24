@@ -141,6 +141,17 @@ const WelcomeDashboard = () => {
           </ul>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Log out</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button type="submit" className="w-full">
+            Log out
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -6,7 +6,7 @@ const BouncePage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/modules/1"); // Replace "/target-page" with your desired destination
+    router.replace("/modules/1");
   }, [router]);
 
   return null; // Don't render anything
