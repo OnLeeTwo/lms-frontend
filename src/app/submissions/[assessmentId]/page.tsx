@@ -23,8 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster";
-import { useToast } from "@/hooks/use-toast"
-
+import { useToast } from "@/hooks/use-toast";
 
 const SubmissionList = () => {
   const router = useRouter();
@@ -339,12 +338,12 @@ const SubmissionList = () => {
             </div>
           )}
           <DialogFooter>
-          <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-            Close
-          </Button>
-          <Button variant="default" onClick={handleSubmitScore}>
-            Submit Score
-          </Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Close
+            </Button>
+            <Button variant="default" onClick={handleSubmitScore}>
+              Submit Score
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
