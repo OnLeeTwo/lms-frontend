@@ -93,7 +93,7 @@ const EditCourse = () => {
       formData.append("category", category);
       formData.append("media", file!);
 
-      await updateCourse(formData, courseId);
+      await updateCourse(formData as Partial<Course>, courseId);
 
       toast({
         title: "Success",

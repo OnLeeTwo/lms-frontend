@@ -44,7 +44,7 @@ const Index = () => {
   const [selectedInstituteId, setSelectedInstituteId] = useState<number>(1); // Track selected institute ID
   const [currentRole, setCurrentRole] = useState<string>(""); // Track selected institution's role
 
-  // Fetch user data from localStorage on mount
+  // Fetch courses only when `userData` and `selectedInstituteId` are available and role is not 'admin'
   useEffect(() => {
     const currentRole = sessionStorage.getItem("currentRole");
     const selectedInstituteId = sessionStorage.getItem("instituteId");
@@ -53,10 +53,7 @@ const Index = () => {
       setCurrentRole(currentRole);
       setSelectedInstituteId(Number(selectedInstituteId));
     }
-  }, []);
 
-  // Fetch courses only when `userData` and `selectedInstituteId` are available and role is not 'admin'
-  useEffect(() => {
     if (currentRole === "instructor") {
       router.push("/instructor/courses");
     } else {
@@ -105,7 +102,7 @@ const Index = () => {
       {/* Sidebar dynamically updates based on the current role */}
       <Sidebar role="student" />
       <div
-        className="p-5 bg-white shadow-md rounded-lg"
+        className="flex flex-col justify-items-center p-5 bg-white shadow-md rounded-lg"
         aria-labelledby="courses-heading"
       >
         <h2 id="courses-heading" className="text-2xl font-semibold mb-4">

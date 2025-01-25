@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
@@ -23,6 +23,8 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addInstitute } from "@/services/instituteService";
+import { Institute } from "@/types/institute";
+import { useToast } from "@/hooks/use-toast";
 import * as z from "zod";
 
 const InstituteSchema = z.object({
@@ -31,15 +33,12 @@ const InstituteSchema = z.object({
 
 const WelcomeDashboard = () => {
   const router = useRouter();
+  const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const storedUserData = localStorage.getItem("userData");
-  const parsedUserData = storedUserData ? JSON.parse(storedUserData) : null;
-
-  if (parsedUserData.roles.length > 0) {
-    router.push("/dashboard");
-  }
-
-  const user = parsedUserData.user;
+  const [parsedUserData, setParsedUserData] = useState<{
+    user: { name: string };
+    roles: string[];
+  } | null>(null);
 
   const form = useForm({
     resolver: zodResolver(InstituteSchema),
@@ -48,18 +47,41 @@ const WelcomeDashboard = () => {
     },
   });
 
-  const onSubmit = async (data) => {
-    try {
-      await addInstitute(data);
+  useEffect(() => {
+    // Access localStorage safely in the client
+    const storedUserData = localStorage.getItem("userData");
+    const userData = storedUserData ? JSON.parse(storedUserData) : null;
 
-      const updatedUserData = {
-        ...parsedUserData,
-        roles: [...parsedUserData.roles, "institute_admin"],
-      };
+    setParsedUserData(userData);
 
-      localStorage.setItem("userData", JSON.stringify(updatedUserData));
-      setDialogOpen(false);
+    if (userData?.roles?.length > 0) {
       router.push("/dashboard");
+    }
+  }, [router]);
+
+  if (!parsedUserData) {
+    return <div>Loading...</div>; // Optional: Add a loading state
+  }
+
+  const user = parsedUserData.user;
+
+  const onSubmit = async (data: Partial<Institute>) => {
+    try {
+      const { name } = data;
+
+      if (name) {
+        await addInstitute(name);
+      } else {
+        throw new Error("Institute name is required");
+      }
+      setDialogOpen(false);
+      router.push("/login");
+      toast({
+        title: "Institute Created",
+        description:
+          "You have successfully created your institute!, please login again to continue",
+        variant: "default",
+      });
     } catch (error) {
       console.error("Institute creation failed:", error);
     }

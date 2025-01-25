@@ -223,15 +223,6 @@ const SubmissionList = () => {
                         <p className="text-lg">
                           Score: {submission.score || "Not graded"}
                         </p>
-                        {submission.assessment_type === "essay" && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleViewDetails(submission)}
-                          >
-                            View Details
-                          </Button>
-                        )}
                       </div>
                     </div>
                     {submission.file && (
@@ -258,7 +249,7 @@ const SubmissionList = () => {
                             <div className="rounded-md bg-muted p-4 font-mono text-sm">
                               {Object.entries(submission.answer).map(
                                 ([question, answer], index) => (
-                                  <div key={index} className="mb-2">
+                                  <div key={question} className="mb-2">
                                     <span className="font-semibold">
                                       {question}:{" "}
                                     </span>

@@ -10,6 +10,7 @@ import Tiptap from "@/components/Tiptap";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Save, Upload, FileText, X } from "lucide-react";
 import { addModule } from "@/services/moduleService";
+import { Module } from "@/types/module";
 
 const AddModule = () => {
   const router = useRouter();
@@ -52,7 +53,15 @@ const AddModule = () => {
         formData.append("module_file", file);
       }
 
-      await addModule(formData, courseId);
+      if (typeof courseId === "string") {
+        await addModule(formData as Partial<Module>, courseId);
+      } else {
+        toast({
+          title: "Error",
+          description: "Invalid course ID",
+          variant: "destructive",
+        });
+      }
 
       toast({
         title: "Success",

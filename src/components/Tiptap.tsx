@@ -239,9 +239,13 @@ const Tiptap = ({
 
   const handleCancel = () => {
     if (editor) {
-      editor.commands.setContent(originalContent);
+      if (originalContent !== undefined) {
+        editor.commands.setContent(originalContent);
+      }
     }
-    onCancel();
+    if (onCancel) {
+      onCancel();
+    }
   };
 
   if (!editor) {
@@ -263,7 +267,7 @@ const Tiptap = ({
           </Button>
           {isCreating && (
             <Button
-              onClick={() => onSave(editor.getHTML())}
+              onClick={() => onSave && onSave(editor.getHTML())}
               className="flex items-center gap-2"
             >
               <Save className="h-4 w-4" />

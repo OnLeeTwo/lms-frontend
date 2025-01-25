@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { AssessmentDetails } from "@/types/assessment";
 
@@ -9,21 +9,52 @@ export default function EssayQuiz({
   assessment: AssessmentDetails | null;
 }) {
   const router = useRouter();
-  const questions =
-    typeof assessment.question === "object"
-      ? Object.values(assessment.question)
-      : [];
+
+  // Move hook calls before any conditional rendering
+  const questions = useMemo(
+    () =>
+      assessment && typeof assessment.question === "object"
+        ? Object.values(assessment.question)
+        : [],
+    [assessment]
+  );
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>(
     questions.map(
-      () => assessment.answer?.[`question${currentQuestionIndex + 1}`] || ""
+      () => assessment?.answer?.[`question${currentQuestionIndex + 1}`] || ""
     )
   );
   const [showSummary, setShowSummary] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const totalQuestions = questions.length;
+  // Early return if no assessment
+  if (!assessment) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">Assessment Not Found</h1>
+          <p className="text-gray-600 mt-4">
+            The assessment data is not available.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Early return if no questions
+  if (!questions.length) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">No Questions Found</h1>
+          <p className="text-gray-600 mt-4">
+            The assessment does not contain any questions.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const handleAnswerChange = (value: string) => {
     const updatedAnswers = [...answers];
@@ -52,19 +83,6 @@ export default function EssayQuiz({
   const jumpToQuestion = (index: number) => {
     setCurrentQuestionIndex(index);
   };
-
-  if (!questions.length) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">No Questions Found</h1>
-          <p className="text-gray-600 mt-4">
-            The assessment does not contain any questions.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
