@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { FaHammer } from "react-icons/fa";
+import { Hammer } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
 
 const UnderConstruction = () => {
@@ -20,9 +20,8 @@ const UnderConstruction = () => {
       {/* Main content area */}
       <div className="flex-1 p-8">
         <div className="text-center p-8 rounded-lg shadow-lg bg-card w-full max-w-lg mx-auto">
-          <FaHammer className="mx-auto text-6xl text-primary mb-4" />
           <h1 className="text-3xl font-semibold text-primary">
-            Page Under Construction
+            <Hammer /> Page Under Construction
           </h1>
           <p className="mt-4 text-muted-foreground">
             We're working hard to bring you this feature. Please check back

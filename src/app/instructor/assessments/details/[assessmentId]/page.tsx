@@ -10,6 +10,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Plus, Trash2, CheckCircle } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
 import { AssessmentDetails } from "@/types/assessment";
@@ -47,6 +53,7 @@ const AssessmentDetailsPage: React.FC = () => {
     deadline: "",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    message: "",
   });
   const [questions, setQuestions] = useState<QuestionWithOptions[]>([
     {
@@ -68,16 +75,37 @@ const AssessmentDetailsPage: React.FC = () => {
         if (typeof assessmentId === "string") {
           const response = await getAssessmentsDetails(assessmentId);
           setCurrentDetails(response);
+
+          const formattedDeadline = response.deadline
+            ? new Date(response.deadline).toISOString().slice(0, 16)
+            : "";
+
+          setCurrentDetails({
+            ...response,
+            deadline: formattedDeadline,
+          });
+
+          // Populate questions based on fetched data
+          if (response.question) {
+            const parsedQuestions: QuestionWithOptions[] = Object.entries(
+              response.question
+            ).map(([question, options]) => ({
+              question,
+              options: Object.entries(options).map(([key, text], index) => ({
+                text: text as string,
+                isCorrect: response.answer?.[question] === key,
+              })),
+            }));
+            setQuestions(parsedQuestions);
+          }
+
+          // Set assessment type based on data
+          setAssessmentType(response.answer ? "choices" : "essay");
         } else {
           throw new Error("Invalid assessment ID");
         }
       } catch (error) {
-        console.error("Error fetching assessment details:", error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch assessment details",
-          variant: "destructive",
-        });
+        console.log("Error fetching assessment details:", error);
       } finally {
         setLoading(false);
       }
@@ -136,8 +164,6 @@ const AssessmentDetailsPage: React.FC = () => {
     let payload: any = {
       title: currentDetails.title,
       deadline: currentDetails.deadline || new Date().toISOString(),
-      created_at: currentDetails.created_at,
-      updated_at: new Date().toISOString(),
     };
 
     if (assessmentType === "choices") {
@@ -146,10 +172,13 @@ const AssessmentDetailsPage: React.FC = () => {
 
       questions.forEach((q, index) => {
         // Create options object
-        questionsObj[q.question] = q.options.reduce((acc, option, idx) => {
-          acc[`option${idx + 1}`] = option.text;
-          return acc;
-        }, {});
+        questionsObj[q.question] = q.options.reduce<Record<string, string>>(
+          (acc, option, idx) => {
+            acc[`option${idx + 1}`] = option.text;
+            return acc;
+          },
+          {}
+        );
 
         // Find correct answer
         const correctOptionIndex = q.options.findIndex((opt) => opt.isCorrect);
@@ -158,8 +187,8 @@ const AssessmentDetailsPage: React.FC = () => {
         }
       });
 
-      payload.questions = questionsObj;
-      payload.answers = answersObj;
+      payload.question = questionsObj;
+      payload.answer = answersObj;
     } else {
       const questionObj: Record<string, string> = {};
       questions.forEach((q, index) => {
@@ -173,9 +202,9 @@ const AssessmentDetailsPage: React.FC = () => {
     }
 
     if (currentDetails.assessment_id) {
-      createAssessment(currentDetails.assessment_id, payload);
-    } else {
       updateAssessment(payload);
+    } else {
+      createAssessment(currentDetails.assessment_id, payload);
     }
 
     setIsDialogOpen(false);
@@ -229,38 +258,61 @@ const AssessmentDetailsPage: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar role="teacher" />
-      <div className="container mx-auto p-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Assessment Details</CardTitle>
+      <div className="container mx-auto p-6 space-y-6">
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <CardHeader className="bg-primary-50 border-b border-gray-200 flex items-center justify-between">
+            <div>
+              <CardTitle className="text-2xl font-bold text-primary-700">
+                {currentDetails.title || "Assessment Details"}
+              </CardTitle>
+              <p className="text-muted-foreground mt-1">
+                {currentDetails.deadline
+                  ? `Deadline: ${new Date(
+                      currentDetails.deadline
+                    ).toLocaleString()}`
+                  : "No deadline set"}
+              </p>
+            </div>
             {currentDetails.title ? (
-              <Button onClick={() => setIsDialogOpen(true)} size="sm">
-                <Plus className="mr-2 h-4 w-4" /> Create/Edit Details
+              <Button
+                onClick={() => setIsDialogOpen(true)}
+                variant="outline"
+                className="hover:bg-primary-100"
+              >
+                <Plus className="mr-2 h-4 w-4" /> Edit Assessment
               </Button>
             ) : null}
           </CardHeader>
+
           {loading ? (
             <LoadingSpinner />
           ) : (
-            <CardContent>
+            <CardContent className="p-6">
               {currentDetails.title ? (
-                <div>
-                  <h2 className="text-xl font-bold mb-4">
-                    {currentDetails.title}
-                  </h2>
-                  <p>Deadline: {currentDetails.deadline}</p>
+                <div className="space-y-4">
                   {Object.entries(currentDetails.question).map(
                     ([question, value]) => (
-                      <div key={question} className="mb-4">
-                        <h3 className="font-semibold">{question}</h3>
+                      <div
+                        key={question}
+                        className="bg-white border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                      >
+                        <h3 className="font-semibold text-lg mb-2">
+                          {question}
+                        </h3>
                         {typeof value === "object" ? (
-                          <ul>
+                          <ul className="space-y-2">
                             {Object.entries(value).map(
                               ([option, optionText]) => (
-                                <li key={option}>
-                                  {option}: {optionText}
+                                <li
+                                  key={option}
+                                  className="flex items-center space-x-2"
+                                >
+                                  <span className="font-medium text-muted-foreground">
+                                    {option}:
+                                  </span>
+                                  <span>{optionText as string}</span>
                                 </li>
                               )
                             )}
@@ -273,13 +325,15 @@ const AssessmentDetailsPage: React.FC = () => {
                   )}
                 </div>
               ) : (
-                <div className="text-center text-gray-500 p-6">
-                  No assessment details found.
+                <div className="text-center py-12 bg-gray-100 rounded-lg">
+                  <p className="text-muted-foreground mb-4">
+                    No assessment details found
+                  </p>
                   <Button
                     onClick={() => setIsDialogOpen(true)}
-                    className="ml-2"
+                    className="mx-auto"
                   >
-                    Create New Details
+                    Create New Assessment
                   </Button>
                 </div>
               )}
@@ -296,28 +350,55 @@ const AssessmentDetailsPage: React.FC = () => {
             {/* Scrollable content area */}
             <div className="max-h-[500px] overflow-y-auto pr-4">
               <div className="grid gap-4 py-4">
-                <div>
+                <div className="grid grid-cols-4 items-center gap-4">
                   <Label>Assessment Type</Label>
-                  <select
-                    value={assessmentType}
-                    onChange={(e) => {
-                      setAssessmentType(e.target.value as "choices" | "essay");
-                      setQuestions([
-                        {
-                          question: "",
-                          options: [
-                            { text: "", isCorrect: false },
-                            { text: "", isCorrect: false },
-                            { text: "", isCorrect: false },
-                            { text: "", isCorrect: false },
-                          ],
-                        },
-                      ]);
-                    }}
-                  >
-                    <option value="choices">Multiple Choice</option>
-                    <option value="essay">Essay</option>
-                  </select>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline">
+                        {assessmentType === "choices"
+                          ? "Multiple Choice"
+                          : "Essay"}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setAssessmentType("choices");
+                          setQuestions([
+                            {
+                              question: "",
+                              options: [
+                                { text: "", isCorrect: false },
+                                { text: "", isCorrect: false },
+                                { text: "", isCorrect: false },
+                                { text: "", isCorrect: false },
+                              ],
+                            },
+                          ]);
+                        }}
+                      >
+                        Multiple Choice
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setAssessmentType("essay");
+                          setQuestions([
+                            {
+                              question: "",
+                              options: [
+                                { text: "", isCorrect: false },
+                                { text: "", isCorrect: false },
+                                { text: "", isCorrect: false },
+                                { text: "", isCorrect: false },
+                              ],
+                            },
+                          ]);
+                        }}
+                      >
+                        Essay
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 <div className="grid grid-cols-4 items-center gap-4">

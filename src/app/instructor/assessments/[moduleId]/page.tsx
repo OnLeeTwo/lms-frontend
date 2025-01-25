@@ -64,8 +64,8 @@ const AssessmentManagementPage: React.FC = () => {
   const handleCreate = () => {
     const newAssessment: Assessment = {
       ...currentAssessment,
-      id: String(assessments.length + 1),
-    } as Assessment;
+      id: assessments.length + 1,
+    } as unknown as Assessment;
 
     setAssessments([...assessments, newAssessment]);
     setIsDialogOpen(false);
@@ -83,7 +83,7 @@ const AssessmentManagementPage: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    setAssessments(assessments.filter((a) => a.id !== Number(id)));
+    setAssessments(assessments.filter((a) => a.id !== id));
   };
 
   const openEditDialog = (assessment: Assessment) => {

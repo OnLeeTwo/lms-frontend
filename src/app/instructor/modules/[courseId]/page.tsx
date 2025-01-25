@@ -81,13 +81,14 @@ const CourseModules = () => {
     if (!selectedModule) return;
 
     try {
-      await deleteModule(courseId, selectedModule.id);
-
-      setModules(modules.filter((Module) => Module.id !== selectedModule.id));
-      toast({
-        title: "Success",
-        description: "Module deleted successfully",
-      });
+      if (typeof courseId === "string") {
+        await deleteModule(courseId, selectedModule.id.toString());
+        setModules(modules.filter((Module) => Module.id !== selectedModule.id));
+        toast({
+          title: "Success",
+          description: "Module deleted successfully",
+        });
+      }
     } catch (error) {
       console.error(error);
       toast({

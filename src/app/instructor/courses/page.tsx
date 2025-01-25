@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
-import { Plus } from "lucide-react";
+import { Plus, Edit, Trash } from "lucide-react";
 import { Course } from "@/types/course";
 import { useToast } from "@/hooks/use-toast";
 import { getToken } from "@/lib/getToken";
@@ -96,7 +96,7 @@ const Courses = () => {
     if (!selectedCourse) return;
 
     try {
-      await deleteCourse(selectedCourse.id);
+      await deleteCourse(selectedCourse.id.toString());
 
       setCourses(courses.filter((course) => course.id !== selectedCourse.id));
       toast({
@@ -152,14 +152,14 @@ const Courses = () => {
                           variant="outline"
                           onClick={() => handleEditCourse(course.id)}
                         >
-                          Edit Course
+                          <Edit /> Edit Course
                         </Button>
                         <Button
                           className="bg-red-500 text-white"
                           variant="outline"
                           onClick={() => handleDeleteClick(course)}
                         >
-                          Delete Course
+                          <Trash /> Delete Course
                         </Button>
                         <Button
                           className="bg-black text-white"

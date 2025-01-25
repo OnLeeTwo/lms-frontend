@@ -1,5 +1,5 @@
 export interface Assessment {
-  id: number;
+  id: string;
   module_id: number;
   type: "essay" | "choices";
   created_at: string;

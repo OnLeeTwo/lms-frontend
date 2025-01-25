@@ -16,7 +16,6 @@ interface SidebarProps {
 export const Sidebar = ({ role }: SidebarProps) => {
   const router = useRouter();
   const menuItems = [
-    { icon: BookOpen, label: "Courses", href: "/courses" },
     { icon: Settings, label: "Settings", href: "/settings" },
     { icon: Users, label: "Profile", href: "/profile" },
     ...(role === "instructor" || role === "teacher"
@@ -28,12 +27,26 @@ export const Sidebar = ({ role }: SidebarProps) => {
           },
         ]
       : []),
+    ...(role === "student"
+      ? [
+          {
+            icon: BookOpen,
+            label: "Student Dashboard",
+            href: `/dashboard`,
+          },
+        ]
+      : []),
     ...(role === "admin"
       ? [
           {
             icon: Shield,
             label: "User Management",
             href: "/admin", // Admin-specific page
+          },
+          {
+            icon: Shield,
+            label: "Enrollment Management",
+            href: "/admin/enrollment", // Admin-specific page
           },
           {
             icon: Shield,
@@ -55,14 +68,20 @@ export const Sidebar = ({ role }: SidebarProps) => {
     sessionStorage.removeItem("currentRole");
     sessionStorage.removeItem("instituteId");
     // Redirect to the index page
-    router.push("/");
+    router.push("/login");
   };
 
   return (
     <nav className="h-screen w-64 bg-primary p-4 text-primary-foreground sticky top-0">
       <div className="mb-8">
         <h1 className="text-2xl font-bold ">
-          <a href="/dashboard">LMS Portal</a>
+          <a href="/dashboard">
+            <img
+              src="/logo.png"
+              alt="SahabatAjar.id"
+              className="w-full h-auto"
+            />
+          </a>
         </h1>
       </div>
       <ul className="space-y-2">

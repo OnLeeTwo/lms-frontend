@@ -9,10 +9,11 @@ import Tiptap from "@/components/Tiptap";
 import { Module } from "@/types/module";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Calendar, FileText, ClipboardList } from "lucide-react";
-
 import { getModuleById, updateModule } from "@/services/moduleService";
 import { getAssessmentsByModuleId } from "@/services/assessmentService";
 import { Assessment } from "@/types/assessment";
+
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 const ModuleDetail = () => {
   const pathname = usePathname();
@@ -21,7 +22,7 @@ const ModuleDetail = () => {
   const regex = /\/modules\/([^/]+)\/details\/([^/]+)/;
   const match = regex.exec(pathname || "");
 
-  const courseId = match?.[1];
+  const courseId = String(match?.[1] ?? "1");
   const moduleId = match?.[2];
   const [module, setModule] = useState<Partial<Module> | undefined>();
   const [assessments, setAssessments] = useState<Assessment[]>([]);
@@ -72,7 +73,7 @@ const ModuleDetail = () => {
         <Sidebar role="student" />
         <div className="p-8 flex-1">
           <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <LoadingSpinner />
           </div>
         </div>
       </div>

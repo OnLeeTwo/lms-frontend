@@ -2,8 +2,10 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export function withAuth(WrappedComponent) {
-  return function ProtectedRoute(props) {
+import { ComponentType } from "react";
+
+export function withAuth(WrappedComponent: ComponentType) {
+  return function ProtectedRoute(props: any) {
     const router = useRouter();
 
     useEffect(() => {

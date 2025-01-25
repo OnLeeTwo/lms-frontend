@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Save, Upload, FileText, X } from "lucide-react";
 import { addCourse } from "@/services/coursesService";
-import { handleWebpackExternalForEdgeRuntime } from "next/dist/build/webpack/plugins/middleware-plugin";
+import { Course } from "@/types/course";
 
 const AddCourse = () => {
   const router = useRouter();
@@ -68,7 +68,7 @@ const AddCourse = () => {
       formData.append("category", category);
       formData.append("media", file!);
 
-      await addCourse(formData);
+      await addCourse(formData as Partial<Course>);
 
       toast({
         title: "Success",

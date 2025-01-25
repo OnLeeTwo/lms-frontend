@@ -42,29 +42,28 @@ const Index = () => {
 
   // Fetch user data from localStorage on mount
   useEffect(() => {
-    const storedUserData = localStorage.getItem("userData");
-    if (storedUserData) {
-      const parsedUserData = JSON.parse(storedUserData);
-      setUserData(parsedUserData);
+    if (typeof window !== "undefined") {
+      const storedUserData = localStorage.getItem("userData");
+      if (storedUserData) {
+        const parsedUserData = JSON.parse(storedUserData);
+        setUserData(parsedUserData);
 
-      if (parsedUserData.roles.length > 0) {
+        // Set initial role from the first institution in the roles
+        const initialRole =
+          parsedUserData.roles.find(
+            (role: Role) => role.institute_id === selectedInstituteId
+          )?.role || "student"; // Default to student if no role found
+
+        const initialRoleId =
+          parsedUserData.roles.find(
+            (role: Role) => role.institute_id === selectedInstituteId
+          )?.role_id || 1;
+
+        setCurrentRole(initialRole);
+        sessionStorage.setItem("currentRoleId", initialRoleId);
+        sessionStorage.setItem("currentRole", initialRole);
+        sessionStorage.setItem("instituteId", selectedInstituteId.toString());
       }
-
-      // Set initial role from the first institution in the roles
-      const initialRole =
-        parsedUserData.roles.find(
-          (role: Role) => role.institute_id === selectedInstituteId
-        )?.role || "student"; // Default to student if no role found
-
-      const initialRoleId =
-        parsedUserData.roles.find(
-          (role: Role) => role.institute_id === selectedInstituteId
-        )?.role_id || 1;
-
-      setCurrentRole(initialRole);
-      sessionStorage.setItem("currentRoleId", initialRoleId);
-      sessionStorage.setItem("currentRole", initialRole);
-      sessionStorage.setItem("instituteId", selectedInstituteId.toString());
     }
   }, []);
 
@@ -123,28 +122,28 @@ const Index = () => {
             <div className="grid grid-cols-2 gap-4 justify-center content-center">
               <a
                 href="/admin"
-                className="flex flex-col place-items-center p-4 border-solid"
+                className="flex flex-col place-items-center p-4 border border-solid border-transparent rounded-lg transition-all duration-300 ease-in-out hover:bg-primary hover:text-white hover:border-primary transform hover:scale-105"
               >
                 <User className="mb-2 h-6 w-6" />
                 User
               </a>
               <a
                 href="/admin/institution"
-                className="flex flex-col place-items-center p-4 border-solid"
+                className="flex flex-col place-items-center p-4 border border-solid border-transparent rounded-lg transition-all duration-300 ease-in-out hover:bg-primary hover:text-white hover:border-primary transform hover:scale-105"
               >
                 <School className="mb-2 h-6 w-6" />
                 Instituiton
               </a>
               <a
                 href="/admin/role"
-                className="flex flex-col place-items-center p-4 border-solid"
+                className="flex flex-col place-items-center p-4 border border-solid border-transparent rounded-lg transition-all duration-300 ease-in-out hover:bg-primary hover:text-white hover:border-primary transform hover:scale-105"
               >
                 <MailQuestion className="mb-2 h-6 w-6" />
                 Role
               </a>
               <a
                 href="/admin/enrollment"
-                className="flex flex-col place-items-center p-4 border-solid"
+                className="flex flex-col place-items-center p-4 border border-solid border-transparent rounded-lg transition-all duration-300 ease-in-out hover:bg-primary hover:text-white hover:border-primary transform hover:scale-105"
               >
                 <GraduationCap className="mb-2 h-6 w-6" />
                 Enrollment
@@ -155,28 +154,28 @@ const Index = () => {
             <div className="grid grid-cols-2 gap-4 justify-center content-center">
               <a
                 href="/instructor/courses"
-                className="flex flex-col place-items-center p-4 border-solid"
+                className="flex flex-col place-items-center p-4 border border-solid border-transparent rounded-lg transition-all duration-300 ease-in-out hover:bg-primary hover:text-white hover:border-primary transform hover:scale-105"
               >
                 <Book className="mb-2 h-6 w-6" />
                 Courses
               </a>
               <a
                 href="/instructor/modules"
-                className="flex flex-col place-items-center p-4 border-solid"
+                className="flex flex-col place-items-center p-4 border border-solid border-transparent rounded-lg transition-all duration-300 ease-in-out hover:bg-primary hover:text-white hover:border-primary transform hover:scale-105"
               >
                 <Library className="mb-2 h-6 w-6" />
                 Module
               </a>
               <a
                 href="/instructor/submissions"
-                className="flex flex-col place-items-center p-4 border-solid"
+                className="flex flex-col place-items-center p-4 border border-solid border-transparent rounded-lg transition-all duration-300 ease-in-out hover:bg-primary hover:text-white hover:border-primary transform hover:scale-105"
               >
                 <ClipboardList className="mb-2 h-6 w-6" />
                 Submission
               </a>
               <a
                 href="/instructor/assessments"
-                className="flex flex-col place-items-center p-4 border-solid"
+                className="flex flex-col place-items-center p-4 border border-solid border-transparent rounded-lg transition-all duration-300 ease-in-out hover:bg-primary hover:text-white hover:border-primary transform hover:scale-105"
               >
                 <Gauge className="mb-2 h-6 w-6" />
                 Assessment
@@ -187,28 +186,28 @@ const Index = () => {
             <div className="grid grid-cols-2 gap-4 justify-center content-center">
               <a
                 href="/courses"
-                className="flex flex-col place-items-center p-4 border-solid"
+                className="flex flex-col place-items-center p-4 border border-solid border-transparent rounded-lg transition-all duration-300 ease-in-out hover:bg-primary hover:text-white hover:border-primary transform hover:scale-105"
               >
                 <Book className="mb-2 h-6 w-6" />
                 Courses
               </a>
               <a
                 href="/modules"
-                className="flex flex-col place-items-center p-4 border-solid"
+                className="flex flex-col place-items-center p-4 border border-solid border-transparent rounded-lg transition-all duration-300 ease-in-out hover:bg-primary hover:text-white hover:border-primary transform hover:scale-105"
               >
                 <Library className="mb-2 h-6 w-6" />
                 Module
               </a>
               <a
-                href="/submissions"
-                className="flex flex-col place-items-center p-4 border-solid"
+                href="/submissions?assessment_id=1"
+                className="flex flex-col place-items-center p-4 border border-solid border-transparent rounded-lg transition-all duration-300 ease-in-out hover:bg-primary hover:text-white hover:border-primary transform hover:scale-105"
               >
                 <ClipboardList className="mb-2 h-6 w-6" />
                 Submission
               </a>
               <a
-                href="/assessments"
-                className="flex flex-col place-items-center p-4 border-solid"
+                href="/assessments/1"
+                className="flex flex-col place-items-center p-4 border border-solid border-transparent rounded-lg transition-all duration-300 ease-in-out hover:bg-primary hover:text-white hover:border-primary transform hover:scale-105"
               >
                 <Gauge className="mb-2 h-6 w-6" />
                 Assessment

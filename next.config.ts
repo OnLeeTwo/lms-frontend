@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
     config.resolve.alias["@"] = path.resolve(__dirname, "src");
     return config;
   },
-  // Any other Next.js configuration options can be added here.
 };
 
 export default nextConfig;

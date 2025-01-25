@@ -7,68 +7,59 @@ import { useToast } from "@/hooks/use-toast";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { apiUrl } from "@/lib/env";
-
-import { Eye, EyeOff } from "lucide-react";
+import { Lock, Mail, LogIn } from "lucide-react";
 import Link from "next/link";
 
 const Login = () => {
   const router = useRouter();
   const { toast } = useToast();
-
-  const [visible, setVisible] = useState<boolean>(true);
-
-  interface LoginValues {
-    email: string;
-    password: string;
-  }
+  const [showPassword, setShowPassword] = useState(false);
 
   const validationSchema = Yup.object({
     email: Yup.string()
-      .email("Invalid email address")
+      .email("Please enter a valid email address")
       .required("Email is required"),
     password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
+      .min(8, "Password must be at least 8 characters")
       .required("Password is required"),
   });
 
   const handleLogin = async (
-    values: LoginValues,
+    values: { email: string; password: string },
     { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
   ) => {
     try {
       const response = await fetch(`${apiUrl}/api/v1/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
         localStorage.setItem("userData", JSON.stringify(data));
         toast({
-          title: "Log In Sukses!",
-          description: `Welcome back, ! Redirecting...`,
-          className: "bg-green-400",
-          duration: 1500,
+          title: "Login Successful",
+          description: `Welcome, ${data.user.name}`,
+          variant: "default",
+          duration: 2000,
         });
-        router.push("/courses");
+        router.push("/dashboard");
       } else {
-        const errorData = await response.json();
         toast({
-          title: "Log In Gagal!",
-          description: errorData.message || "Invalid email or password.",
-          className: "bg-red-400",
-          duration: 1500,
+          title: "Login Failed",
+          description: data.message || "Invalid credentials",
+          variant: "destructive",
+          duration: 2000,
         });
       }
-    } catch {
+    } catch (error) {
       toast({
-        title: "Log In Gagal!",
-        description: "Failed to connect to the server.",
-        className: "bg-red-400",
-        duration: 1500,
+        title: "Connection Error",
+        description: "Unable to connect to the server",
+        variant: "destructive",
+        duration: 2000,
       });
     } finally {
       setSubmitting(false);
@@ -76,98 +67,110 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md space-y-8 p-8 bg-card rounded-lg shadow-lg">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold">Welcome Back</h2>
-          <p className="text-muted-foreground mt-2">
-            Please sign in to continue
-          </p>
-        </div>
-        <Formik
-          initialValues={{ email: "", password: "" }}
-          validationSchema={validationSchema}
-          onSubmit={handleLogin}
-        >
-          {({ isSubmitting }) => (
-            <Form className="mt-8 space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium mb-2"
-                  >
-                    Email
-                    <span className="text-red-500">*</span>
-                  </label>
-                  <Field
-                    id="email"
-                    type="email"
-                    name="email"
-                    as={Input}
-                    placeholder="Enter your email"
-                    required
-                  />
-                  <ErrorMessage
-                    name="email"
-                    component="p"
-                    className="text-red-500 text-sm mt-1"
-                  />
-                </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 p-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="p-8 space-y-6">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Sign In</h1>
+            <p className="text-gray-500">Access your account</p>
+          </div>
 
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium mb-2"
-                  >
-                    Password
-                    <span className="text-red-500">*</span>
+          <Formik
+            initialValues={{ email: "", password: "" }}
+            validationSchema={validationSchema}
+            onSubmit={handleLogin}
+          >
+            {({ isSubmitting }) => (
+              <Form className="space-y-4">
+                <div className="relative">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Email Address
                   </label>
-                  <div className="relative w-full">
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <Field
-                      id="password"
-                      type={visible ? "password" : "text"}
-                      name="password"
+                      name="email"
+                      type="email"
                       as={Input}
-                      placeholder="Enter your password"
-                      required
+                      placeholder="Enter your email"
+                      className="pl-10"
                     />
-                    <div
-                      className="absolute inset-y-0 right-0 flex items-center px-3 cursor-pointer"
-                      onClick={() => setVisible(!visible)}
-                    >
-                      {visible ? (
-                        <EyeOff className="h-5 w-5" />
-                      ) : (
-                        <Eye className="h-5 w-5" />
-                      )}
-                    </div>
                   </div>
                   <ErrorMessage
                     name="email"
-                    component="p"
+                    component="div"
                     className="text-red-500 text-sm mt-1"
                   />
                 </div>
-              </div>
 
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Logging in..." : "Log In"}
-              </Button>
-            </Form>
-          )}
-        </Formik>
-        <div className="flex justify-center items-center">
-        <a href="#" className="text-sm mr-1">
-        Don&apos;t have an account?
-        </a>
-        <Link
-          href="/register"
-          className=" text-blue-500 font-semibold text-sm hover:underline"
-        >
-          Register Here
-        </Link>
-      </div>
+                <div className="relative">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Field
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      as={Input}
+                      placeholder="Enter your password"
+                      className="pl-10 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? (
+                        <Lock className="h-5 w-5" />
+                      ) : (
+                        <LogIn className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      className="mr-2 rounded text-blue-500 focus:ring-blue-400"
+                    />
+                    Remember me
+                  </label>
+                  <a href="#" className="text-blue-500 hover:underline">
+                    Forgot Password?
+                  </a>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full mt-4 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
+                >
+                  {isSubmitting ? "Signing In..." : "Sign In"}
+                </Button>
+              </Form>
+            )}
+          </Formik>
+
+          <div className="text-center mt-4 border-t pt-4">
+            <p className="text-gray-600">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/register"
+                className="text-blue-500 font-semibold hover:underline"
+              >
+                Create Account
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

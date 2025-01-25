@@ -29,7 +29,7 @@ const ModuleDetail = () => {
   const regex = /\/modules\/([^/]+)\/details\/([^/]+)/;
   const match = regex.exec(pathname || "");
 
-  const courseId = match?.[1];
+  const courseId = String(match?.[1] ?? 1);
   const moduleId = match?.[2];
   const [module, setModule] = useState<Partial<Module> | undefined>();
   const [assessments, setAssessments] = useState<Assessment[]>([]);
@@ -46,7 +46,11 @@ const ModuleDetail = () => {
       const updatedModule = {
         content: content,
       };
-      await updateModule(updatedModule, courseId, moduleId);
+      if (courseId && moduleId) {
+        await updateModule(updatedModule, courseId, moduleId);
+      } else {
+        throw new Error("Course ID or Module ID is undefined");
+      }
       setModule(updatedModule);
       setIsEditing(false);
 
@@ -74,7 +78,7 @@ const ModuleDetail = () => {
         setLoading(true);
         if (typeof moduleId === "string") {
           const [moduleData, assessmentData] = await Promise.all([
-            getModuleById(moduleId, courseId),
+            getModuleById(moduleId, courseId.toString()),
             getAssessmentsByModuleId(moduleId),
           ]);
           setModule(moduleData);
